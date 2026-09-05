@@ -99,8 +99,15 @@
   .chips{display:flex;flex-wrap:wrap;gap:7px;}
   .chip{appearance:none;border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.14);color:#fff;font-family:var(--sans);font-size:12px;font-weight:500;padding:9px 14px;border-radius:99px;cursor:pointer;}
   .chip[aria-pressed=true]{background:#fff;color:var(--peri-3);border-color:#fff;}
-  .card .chip{border-color:rgba(90,99,196,.3);background:var(--mist);color:var(--ink);}
-  .card .chip[aria-pressed=true]{background:var(--peri-3);color:#fff;border-color:var(--peri-3);}
+  .card .chip,.sheet .chip{border-color:rgba(90,99,196,.3);background:var(--mist);color:var(--ink);}
+  .card .chip[aria-pressed=true],.sheet .chip[aria-pressed=true]{background:var(--peri-3);color:#fff;border-color:var(--peri-3);}
+  .sheet .fl{margin-top:18px;}
+  .sheet .row2{align-items:flex-end;}
+  .sheet .level button{padding:10px 2px;font-size:11px;line-height:1.15;min-width:0;}
+  .sheet .small{font-size:12px;color:var(--ink-soft);line-height:1.5;margin-top:6px;}
+  .matches{margin-top:8px;display:flex;flex-direction:column;gap:6px;}
+  .match{appearance:none;text-align:left;background:var(--mist);border:1px solid rgba(90,99,196,.22);border-radius:12px;padding:11px 13px;font-family:var(--sans);cursor:pointer;}
+  .match .mn{font-size:14px;font-weight:600;color:var(--ink);} .match .mb{font-size:12px;color:var(--ink-soft);margin-top:2px;}
   input[type=text],input[type=date],input[type=number],textarea,select{width:100%;font-family:var(--sans);font-size:15px;color:var(--ink);background:#F6F6FD;border:1px solid rgba(90,99,196,.22);border-radius:12px;padding:12px 13px;}
   input:focus,textarea:focus,select:focus{outline:none;border-color:var(--peri-3);}
   textarea{min-height:88px;resize:vertical;}
@@ -564,15 +571,16 @@ function openAddProduct(prefill){
   prefill=prefill||{};
   var cats=Object.keys(CATS).map(function(k){return '<option value="'+k+'"'+(prefill.cat===k?" selected":"")+'>'+CATS[k].label+'</option>';}).join("");
   openSheet('<h3>Add to <em>your shelf</em></h3>'+
-    '<div id="scan-area"><button class="ghost" id="scan-btn" style="margin-top:12px;">Scan the barcode</button><div id="scan-host"></div></div>'+
-    '<label class="fl">Product name</label><input type="text" id="ap-name" placeholder="e.g. Azelaic Acid 10%" value="'+esc(prefill.name||"")+'" />'+
-    '<label class="fl">Brand</label><input type="text" id="ap-brand" placeholder="e.g. The Ordinary" value="'+esc(prefill.brand||"")+'" />'+
+    '<label class="fl">Product name</label><input type="text" id="ap-name" placeholder="e.g. Guava Vitamin C Dark Spot Serum" value="'+esc(prefill.name||"")+'" />'+
+    '<label class="fl">Brand</label><input type="text" id="ap-brand" placeholder="e.g. Glow Recipe" value="'+esc(prefill.brand||"")+'" />'+
+    '<button class="ghost" id="find-btn" style="margin-top:10px;">Find it by name</button><div id="find-host"></div>'+
     '<label class="fl">What kind of product</label><select id="ap-cat">'+cats+'</select>'+
-    '<label class="fl">Ingredients (paste the list, optional but powerful)</label><textarea id="ap-ings" placeholder="Aqua, Niacinamide, Glycerin...">'+esc(prefill.ings||"")+'</textarea>'+
-    '<div class="row2"><div><label class="fl">Opened on</label><input type="date" id="ap-opened" value="'+todayISO()+'" /></div><div><label class="fl">Months until expiry (PAO)</label><input type="number" id="ap-pao" placeholder="auto" min="1" max="36" /></div></div>'+
+    '<label class="fl">Ingredients</label><textarea id="ap-ings" placeholder="Optional, but this is how I read what is in it. Paste the list, or let me find it above.">'+esc(prefill.ings||"")+'</textarea>'+
+    '<div class="row2"><div><label class="fl">Opened on</label><input type="date" id="ap-opened" value="'+todayISO()+'" /></div><div><label class="fl">Expiry, months</label><input type="number" id="ap-pao" placeholder="auto" min="1" max="36" /></div></div>'+
     '<label class="fl">How full is it?</label><div class="level" id="ap-level">'+LEVELS.map(function(l){return '<button type="button" data-l="'+l[0]+'" aria-pressed="'+(l[0]===100)+'">'+l[1]+'</button>';}).join("")+'</div>'+
-    '<label class="fl">When do you use it?</label><div class="chips" style="margin-top:2px;"><button class="chip" id="ap-am" aria-pressed="false" type="button">Mornings</button><button class="chip" id="ap-pm" aria-pressed="false" type="button">Evenings</button></div>'+
-    '<label class="fl">Is this new to you?</label><div class="chips" style="margin-top:2px;"><button class="chip" id="ap-new" aria-pressed="false" type="button">Yes, just starting it</button></div>'+
+    '<label class="fl">When do you use it?</label><div class="chips"><button class="chip" id="ap-am" aria-pressed="false" type="button">Mornings</button><button class="chip" id="ap-pm" aria-pressed="false" type="button">Evenings</button></div>'+
+    '<label class="fl">Is this new to you?</label><div class="chips"><button class="chip" id="ap-new" aria-pressed="false" type="button">Yes, just starting it</button></div>'+
+    '<label class="fl">Have the packaging?</label><div id="scan-area"><button class="ghost" id="scan-btn" style="margin-top:0;">Scan the barcode</button><div id="scan-host"></div></div>'+
     '<button class="cta" id="ap-save">Add it</button><button class="ghost" id="ap-cancel">Cancel</button>');
   var lvl=100;
   el("ap-level").querySelectorAll("button").forEach(function(b){ b.onclick=function(){ lvl=+b.dataset.l; el("ap-level").querySelectorAll("button").forEach(function(x){x.setAttribute("aria-pressed",x===b);}); }; });
@@ -581,6 +589,7 @@ function openAddProduct(prefill){
   el("ap-cat").onchange();
   el("ap-cancel").onclick=closeSheet;
   el("scan-btn").onclick=startScan;
+  el("find-btn").onclick=function(){ lookupByName(el("ap-brand").value.trim(),el("ap-name").value.trim()); };
   el("ap-save").onclick=function(){
     var name=el("ap-name").value.trim(); if(!name){ toast("It needs a name."); return; }
     var cat=el("ap-cat").value, ings=el("ap-ings").value.trim();
@@ -593,7 +602,7 @@ function openAddProduct(prefill){
 }
 function startScan(){
   var host=el("scan-host");
-  if(!("BarcodeDetector" in window)){ host.innerHTML='<p style="font-size:13px;color:var(--ink-soft);margin-top:8px;">This browser cannot read barcodes (Safari on iPhone does not yet). Type the barcode number instead:</p><div class="row2" style="margin-top:6px;"><div><input type="text" id="bc-manual" placeholder="e.g. 769915190847" inputmode="numeric" /></div><div style="flex:0 0 90px;"><button class="cta" id="bc-look" style="margin-top:0;padding:12px;">Look up</button></div></div>'; el("bc-look").onclick=function(){ lookupBarcode(el("bc-manual").value.trim()); }; return; }
+  if(!("BarcodeDetector" in window)){ host.innerHTML='<p style="font-size:13px;color:var(--ink-soft);margin-top:8px;">Safari on iPhone cannot scan yet. Type the number under the barcode:</p><div class="row2" style="margin-top:6px;"><div><input type="text" id="bc-manual" placeholder="e.g. 769915190847" inputmode="numeric" /></div><div style="flex:0 0 90px;"><button class="cta" id="bc-look" style="margin-top:0;padding:12px;">Look up</button></div></div>'; el("bc-look").onclick=function(){ lookupBarcode(el("bc-manual").value.trim()); }; return; }
   host.innerHTML='<video id="bcvid" autoplay playsinline muted></video><p style="font-size:12px;color:var(--ink-soft);margin-top:6px;">Hold the barcode steady in view.</p>';
   navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}}).then(function(stream){
     bcStream=stream; var v=el("bcvid"); v.srcObject=stream;
@@ -601,6 +610,29 @@ function startScan(){
     var tick=function(){ if(!bcStream) return; det.detect(v).then(function(codes){ if(codes.length){ stopScan(); lookupBarcode(codes[0].rawValue); } else setTimeout(tick,350); }).catch(function(){ setTimeout(tick,500); }); };
     v.onloadedmetadata=tick;
   }).catch(function(){ host.innerHTML='<p style="font-size:13px;color:var(--ink-soft);margin-top:8px;">No camera access. Type the name instead.</p>'; });
+}
+function lookupByName(brand,name){
+  var host=el("find-host"); if(!host) return;
+  if(!name&&!brand){ toast("Give me a name or a brand first."); return; }
+  host.innerHTML='<div class="small">Looking...</div>';
+  var q=[brand,name].filter(Boolean).join(" ");
+  fetch("https://world.openbeautyfacts.org/cgi/search.pl?search_terms="+encodeURIComponent(q)+"&search_simple=1&action=process&json=1&page_size=8&fields=product_name,brands,ingredients_text,code")
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var ps=(d.products||[]).filter(function(x){return x.product_name;});
+      if(!ps.length){ noMatch(host,brand,name); return; }
+      host.innerHTML='<div class="small">Is it one of these? Tap to fill in what I found.</div><div class="matches">'+ps.map(function(x,i){return '<button type="button" class="match" data-i="'+i+'"><div class="mn">'+esc(x.product_name)+'</div><div class="mb">'+esc(x.brands||"")+(x.ingredients_text?" \u00B7 ingredients on file":" \u00B7 no ingredients on file")+'</div></button>';}).join("")+'</div><div class="small" id="find-none" style="margin-top:8px;">None of these? <button class="link" id="find-web" type="button">Find the list on the web</button></div>';
+      host.querySelectorAll(".match").forEach(function(b){ b.onclick=function(){ var x=ps[+b.dataset.i]; if(x.product_name) el("ap-name").value=x.product_name; if(x.brands) el("ap-brand").value=x.brands.split(",")[0].trim(); if(x.ingredients_text){ el("ap-ings").value=x.ingredients_text; host.innerHTML='<div class="small" style="color:var(--ok);">Found it, ingredients filled in. Check the category.</div>'; } else { noMatch(host,el("ap-brand").value,el("ap-name").value,true); } }; });
+      var fw=el("find-web"); if(fw) fw.onclick=function(){ noMatch(host,brand,name); };
+    })
+    .catch(function(){ noMatch(host,brand,name); });
+}
+function noMatch(host,brand,name,partial){
+  var q=[brand,name].filter(Boolean).join(" ");
+  host.innerHTML='<div class="small">'+(partial?"That one is in the database without its ingredients. ":"Not in the open database yet. ")+'Two quick ways to get the list:</div>'+
+    '<div class="matches"><a class="match" href="https://incidecoder.com/search?query='+encodeURIComponent(q)+'" target="_blank" rel="noopener" style="text-decoration:none;"><div class="mn">Open INCIDecoder</div><div class="mb">Copy the ingredient list from there and paste it below</div></a>'+
+    '<a class="match" href="https://www.google.com/search?q='+encodeURIComponent(q+" ingredients list")+'" target="_blank" rel="noopener" style="text-decoration:none;"><div class="mn">Search the web</div><div class="mb">The brand site usually has it under "ingredients"</div></a></div>'+
+    '<div class="small">Or just pick the product type below. I can still order it, dose it and check the obvious clashes from that alone.</div>';
 }
 function lookupBarcode(code){
   if(!code){ toast("No barcode."); return; }
