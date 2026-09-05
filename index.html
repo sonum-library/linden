@@ -1,505 +1,1073 @@
 <!--
   Linden, read your skin
   Copyright (c) 2026 Sonum Samra. All rights reserved.
-  Design prototype. Not for copying, redistribution or reuse.
+  Proprietary. Not for copying, redistribution or reuse. See LICENSE.
 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Linden, read your skin</title>
-<meta name="description" content="Linden. Read your skin. A skin reading and routine app, in early design." />
-<meta name="theme-color" content="#0E1030" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#5A63C4" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Linden" />
 <meta name="copyright" content="Copyright (c) 2026 Sonum Samra. All rights reserved." />
 <meta name="author" content="Sonum Samra" />
-<meta property="og:title" content="Linden" />
-<meta property="og:description" content="Read your skin. An early look at the design." />
-<meta property="og:type" content="website" />
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'%3E%3Crect width='240' height='240' fill='%235A63C4'/%3E%3C/svg%3E" />
+<meta name="description" content="Linden. Read your skin. A skin reading and routine intelligence app." />
+<title>Linden, read your skin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
   :root{
     --peri-1:#9BA4F0; --peri-2:#7C86E2; --peri-3:#5A63C4; --peri-deep:#3A3F8F;
-    --lilac:#C3B9F2; --mist:#E8E9FB;
-    --ink:#1C1F45; --ink-soft:#5A5E8C;
-    --white:#FFFFFF;
-    --serif:"Instrument Serif",Georgia,serif;
-    --sans:"Inter",-apple-system,sans-serif;
+    --lilac:#C3B9F2; --mist:#E8E9FB; --ink:#1C1F45; --ink-soft:#5A5E8C; --white:#fff;
+    --ok:#6E9C74; --warn:#C99A4E; --bad:#C4635F;
+    --serif:"Instrument Serif",Georgia,serif; --sans:"Inter",-apple-system,sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:var(--sans);background:#0E1030;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:28px 16px 60px;}
-
-  .brandbar{text-align:center;margin-bottom:22px;}
-  .brandbar h1{font-family:var(--serif);font-size:44px;color:#fff;font-weight:400;letter-spacing:-0.5px;}
-  .brandbar h1 em{font-style:italic;color:var(--lilac);}
-  .brandbar p{font-family:var(--sans);font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-top:8px;}
-
-  /* phone */
-  .phone{width:380px;max-width:100%;height:780px;flex-shrink:0;border-radius:44px;overflow:hidden;position:relative;
-    box-shadow:0 50px 100px -30px rgba(0,0,0,0.8),0 0 0 10px #14163A,0 0 0 11px rgba(255,255,255,0.09);}
-  .screen{position:absolute;inset:0;overflow:hidden;}
-
-  /* periwinkle mesh */
-  .mesh{position:absolute;inset:0;
-    background:
-      radial-gradient(60% 45% at 18% 12%, var(--lilac) 0%, transparent 60%),
+  html,body{height:100%;}
+  body{font-family:var(--sans);color:var(--ink);background:var(--peri-2);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+  .mesh{position:fixed;inset:0;z-index:0;
+    background:radial-gradient(60% 45% at 18% 12%, var(--lilac) 0%, transparent 60%),
       radial-gradient(55% 40% at 88% 22%, #A9B2F7 0%, transparent 58%),
       radial-gradient(70% 50% at 50% 100%, var(--peri-3) 0%, transparent 65%),
       linear-gradient(165deg, var(--peri-1) 0%, var(--peri-2) 48%, var(--peri-3) 100%);}
-  .grain{position:absolute;inset:0;opacity:0.16;pointer-events:none;
+  .grain{position:fixed;inset:0;z-index:1;opacity:0.14;pointer-events:none;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");}
-
-  /* the swan, signature element */
-  .swanlayer{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+  .swanlayer{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden;}
   .swan{position:absolute;width:150px;opacity:0;left:-200px;will-change:transform,opacity;}
-  .swan.two{width:96px;}
-  @media(prefers-reduced-motion:reduce){.swan{display:none;}}
-  .feathers{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+  .feathers{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden;}
   .fth{position:absolute;}
-  .fth.f1{width:74px;top:8%;right:-14px;transform:rotate(24deg);opacity:0.13;}
-  .fth.f2{width:52px;top:44%;left:-10px;transform:rotate(-38deg);opacity:0.10;}
-  .fth.f3{width:88px;bottom:14%;right:6%;transform:rotate(148deg);opacity:0.09;}
-  .fth.f4{width:44px;top:70%;left:26%;transform:rotate(72deg);opacity:0.08;}
-  .rip{position:absolute;transform:translate(-50%,-50%);pointer-events:none;}
-  .rip i{position:absolute;left:0;top:0;border:1.5px solid rgba(255,255,255,0.55);border-radius:50%;
-    transform:translate(-50%,-50%) scaleY(0.42);animation:ripple 2.2s cubic-bezier(.18,.7,.3,1) forwards;}
+  .fth.f1{width:80px;top:6%;right:-16px;transform:rotate(24deg);opacity:0.12;}
+  .fth.f2{width:56px;top:46%;left:-12px;transform:rotate(-38deg);opacity:0.10;}
+  .fth.f3{width:92px;bottom:12%;right:5%;transform:rotate(148deg);opacity:0.08;}
+  @media(prefers-reduced-motion:reduce){.swan{display:none;}}
+
+  .rip{position:fixed;z-index:3;transform:translate(-50%,-50%);pointer-events:none;}
+  .rip i{position:absolute;left:0;top:0;border:1.5px solid rgba(255,255,255,0.55);border-radius:50%;transform:translate(-50%,-50%) scaleY(0.42);animation:ripple 2.2s cubic-bezier(.18,.7,.3,1) forwards;}
   .rip i:nth-child(2){animation-delay:.16s;border-color:rgba(255,255,255,0.38);}
   .rip i:nth-child(3){animation-delay:.34s;border-color:rgba(255,255,255,0.26);}
   .rip i:nth-child(4){animation-delay:.54s;border-color:rgba(255,255,255,0.16);}
-  @keyframes ripple{
-    0%{width:8px;height:8px;opacity:0;}
-    12%{opacity:0.9;}
-    100%{width:300px;height:300px;opacity:0;}
-  }
-  .rip .fea{position:absolute;left:0;top:0;width:15px;transform:translate(-50%,-50%) rotate(-18deg);
-    animation:feadrop 2.2s cubic-bezier(.2,.7,.3,1) forwards;transform-origin:center;}
-  @keyframes feadrop{
-    0%{opacity:0;transform:translate(-50%,-160%) rotate(-40deg) scale(0.7);}
-    18%{opacity:0.95;transform:translate(-50%,-50%) rotate(-18deg) scale(1);}
-    60%{opacity:0.7;transform:translate(-50%,-46%) rotate(-8deg) scale(1);}
-    100%{opacity:0;transform:translate(-50%,-40%) rotate(4deg) scale(1.05);}
-  }
+  @keyframes ripple{0%{width:8px;height:8px;opacity:0;}12%{opacity:0.9;}100%{width:300px;height:300px;opacity:0;}}
+  .rip .fea{position:absolute;left:0;top:0;width:15px;animation:feadrop 2.2s cubic-bezier(.2,.7,.3,1) forwards;}
+  @keyframes feadrop{0%{opacity:0;transform:translate(-50%,-160%) rotate(-40deg) scale(.7);}18%{opacity:.95;transform:translate(-50%,-50%) rotate(-18deg);}60%{opacity:.7;transform:translate(-50%,-46%) rotate(-8deg);}100%{opacity:0;transform:translate(-50%,-40%) rotate(4deg) scale(1.05);}}
 
-  /* opening: misted water */
-  .fog{position:absolute;inset:0;z-index:60;pointer-events:none;}
-  .fog .pane{position:absolute;left:0;right:0;height:50.5%;
-    background:linear-gradient(180deg,#F2F3FD 0%,#E4E7F8 60%,#D8DCF4 100%);
-    transform:translateY(0);transition:none;}
+  /* opening */
+  .fog{position:fixed;inset:0;z-index:100;pointer-events:none;}
+  .fog .pane{position:absolute;left:0;right:0;height:50.5%;background:linear-gradient(180deg,#F2F3FD 0%,#E4E7F8 60%,#D8DCF4 100%);transform:translateY(0);transition:none;}
   .fog.armed .pane{transition:transform 1.5s cubic-bezier(.72,0,.3,1);}
   .fog .pane.top{top:0;box-shadow:0 10px 30px -14px rgba(40,45,110,0.35);}
-  .fog .pane.bot{bottom:0;background:linear-gradient(0deg,#F2F3FD 0%,#E4E7F8 60%,#D8DCF4 100%);
-    box-shadow:0 -10px 30px -14px rgba(40,45,110,0.35);}
-  .fog.clear .pane.top{transform:translateY(-100%);}
-  .fog.clear .pane.bot{transform:translateY(100%);}
-  .fog .mark{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    transition:opacity .5s ease .1s;}
+  .fog .pane.bot{bottom:0;background:linear-gradient(0deg,#F2F3FD 0%,#E4E7F8 60%,#D8DCF4 100%);box-shadow:0 -10px 30px -14px rgba(40,45,110,0.35);}
+  .fog.clear .pane.top{transform:translateY(-100%);} .fog.clear .pane.bot{transform:translateY(100%);}
+  .fog .mark{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s ease .1s;}
   .fog.clear .mark{opacity:0;}
-  .fog .waterline{position:absolute;top:50%;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(90,99,196,0.5),transparent);
-    transition:opacity .6s ease;}
+  .fog .waterline{position:absolute;top:50%;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(90,99,196,0.5),transparent);transition:opacity .6s ease;}
   .fog.clear .waterline{opacity:0;}
   .fog .glider{position:absolute;top:calc(50% - 46px);left:-120px;width:112px;opacity:0;}
   .fog.glide .glider{animation:swanpass 2.3s cubic-bezier(.4,0,.5,1) forwards;}
-  @keyframes swanpass{
-    0%{left:-120px;opacity:0;}
-    18%{opacity:0.95;}
-    75%{opacity:0.95;}
-    100%{left:110%;opacity:0;}
-  }
-  .fog .fw{font-family:var(--serif);font-size:52px;color:var(--peri-3);}
-  .fog .fw em{font-style:italic;}
-  .fog .fs{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:var(--ink-soft);margin-top:10px;}
-  .fog svg{margin-bottom:14px;opacity:0.8;}
+  @keyframes swanpass{0%{left:-120px;opacity:0;}18%{opacity:.95;}75%{opacity:.95;}100%{left:110%;opacity:0;}}
+  .fog .fw{font-family:var(--serif);font-size:52px;color:var(--peri-3);} .fog .fw em{font-style:italic;}
+  .fog .fs{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--ink-soft);margin-top:10px;}
 
-  /* content */
-  .inner{position:absolute;inset:0;display:flex;flex-direction:column;z-index:5;}
-  .head{padding:52px 26px 14px;}
-  .greet{font-family:var(--serif);font-size:34px;color:#fff;font-weight:400;line-height:1.05;}
+  /* app shell */
+  .app{position:relative;z-index:2;max-width:560px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
+  .head{padding:max(52px,env(safe-area-inset-top)) 22px 12px;}
+  .greet{font-family:var(--serif);font-size:32px;color:#fff;font-weight:400;line-height:1.05;}
   .greet em{font-style:italic;}
-  .date{font-family:var(--sans);font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.62);margin-top:9px;}
-
-  .scroll{flex:1;overflow-y:auto;padding:6px 20px 20px;-webkit-overflow-scrolling:touch;}
-  .scroll::-webkit-scrollbar{display:none;}
-
-  .label{font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:rgba(255,255,255,0.72);margin:20px 4px 10px;display:flex;justify-content:space-between;align-items:center;}
-  .label .pill{background:rgba(255,255,255,0.2);border-radius:99px;padding:4px 10px;letter-spacing:0.1em;font-size:9px;color:#fff;}
-
-  .card{background:rgba(255,255,255,0.94);border-radius:20px;padding:20px;margin-bottom:12px;
-    box-shadow:0 16px 34px -20px rgba(30,25,80,0.5);}
-  .card .k{font-family:var(--sans);font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink-soft);}
+  .date{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.65);margin-top:8px;}
+  .content{flex:1;padding:6px 16px 110px;}
+  .label{font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.75);margin:22px 4px 10px;display:flex;justify-content:space-between;align-items:center;}
+  .label .pill{background:rgba(255,255,255,.2);border-radius:99px;padding:4px 10px;letter-spacing:.1em;font-size:9px;color:#fff;}
+  .card{background:rgba(255,255,255,.95);border-radius:20px;padding:20px;margin-bottom:12px;box-shadow:0 16px 34px -20px rgba(30,25,80,.5);}
+  .card .k{font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);}
   .card .t{font-family:var(--serif);font-size:25px;color:var(--ink);line-height:1.2;margin-top:7px;font-weight:400;}
   .card .t em{font-style:italic;color:var(--peri-3);}
   .card p{font-size:14px;color:var(--ink-soft);line-height:1.55;margin-top:9px;}
-
-  .zonegrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px;}
-  .zone{background:var(--mist);border-radius:13px;padding:12px;}
-  .zone .zn{font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;}
-  .zone .zv{font-family:var(--serif);font-size:22px;color:var(--ink);margin-top:3px;}
-  .bar{height:3px;background:rgba(90,99,196,0.18);border-radius:9px;margin-top:8px;overflow:hidden;}
-  .bar span{display:block;height:100%;background:var(--peri-2);border-radius:9px;}
-
-  .flag{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid rgba(90,99,196,0.13);align-items:flex-start;}
+  .flag{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid rgba(90,99,196,.13);align-items:flex-start;}
   .flag:last-child{border-bottom:none;}
   .flag .dot{width:7px;height:7px;border-radius:50%;margin-top:6px;flex-shrink:0;}
-  .flag .fx{flex:1;}
-  .flag .fn{font-size:14px;font-weight:600;color:var(--ink);}
-  .flag .fd{font-size:13px;color:var(--ink-soft);margin-top:2px;line-height:1.45;}
-
-  .swanrow{display:flex;gap:9px;overflow-x:auto;padding:2px;}
-  .swanrow::-webkit-scrollbar{display:none;}
-  .swanshot{flex:0 0 96px;height:126px;border-radius:14px;overflow:hidden;position:relative;
-    background:linear-gradient(160deg,#D9DCF7,#B9BFEE);}
-  .swanshot .dt{position:absolute;bottom:0;left:0;right:0;padding:7px 8px;font-size:9px;letter-spacing:0.1em;
-    text-transform:uppercase;color:#fff;background:linear-gradient(transparent,rgba(28,31,69,0.75));}
-  .swanshot.new{background:linear-gradient(160deg,#EDEFFC,#D5D9F5);display:flex;align-items:center;justify-content:center;
-    border:1px dashed rgba(90,99,196,0.4);}
-
-  .tabs{display:flex;background:rgba(255,255,255,0.97);padding:11px 8px 24px;gap:2px;}
-  .tab{flex:1;text-align:center;padding:7px 2px;cursor:pointer;border:none;background:none;font-family:var(--sans);}
-  .tab .ti{height:19px;display:flex;align-items:center;justify-content:center;}
-  .tab .tl{font-size:9px;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-soft);margin-top:4px;font-weight:500;}
-  .tab.on .tl{color:var(--peri-3);font-weight:600;}
-  .tab svg{stroke:var(--ink-soft);}
-  .tab.on svg{stroke:var(--peri-3);}
-
-  .view{display:none;}
-  .view.on{display:block;}
-
-  .cygnet{display:inline-block;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;background:var(--mist);
-    color:var(--peri-3);padding:4px 9px;border-radius:99px;font-weight:600;margin-left:7px;vertical-align:middle;}
-
-  .cta{width:100%;background:var(--peri-3);color:#fff;border:none;border-radius:15px;padding:15px;
-    font-family:var(--sans);font-size:14px;font-weight:600;letter-spacing:0.02em;cursor:pointer;margin-top:6px;}
-  .ghost{width:100%;background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.45);border-radius:15px;
-    padding:14px;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-top:9px;}
-
-  .note{text-align:center;color:rgba(255,255,255,0.75);font-size:12px;margin-top:26px;max-width:380px;line-height:1.6;}
-  .replay{margin-top:14px;background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.25);
-    border-radius:99px;padding:9px 18px;font-family:var(--sans);font-size:12px;cursor:pointer;}
-
-  @media (max-width:430px){
-    body{padding:14px 8px 40px;}
-    .brandbar h1{font-size:34px;}
-    .phone{width:100%;height:calc(100vh - 190px);min-height:560px;border-radius:34px;
-      box-shadow:0 30px 60px -26px rgba(0,0,0,0.8),0 0 0 6px #14163A,0 0 0 7px rgba(255,255,255,0.09);}
-    .head{padding:34px 20px 10px;}
-    .greet{font-size:27px;}
-  }
+  .flag .fx{flex:1;} .flag .fn{font-size:14px;font-weight:600;color:var(--ink);} .flag .fd{font-size:13px;color:var(--ink-soft);margin-top:2px;line-height:1.45;}
+  .step{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid rgba(90,99,196,.13);}
+  .step:last-child{border-bottom:none;}
+  .step .n{font-family:var(--serif);font-size:22px;color:var(--peri-3);width:26px;flex-shrink:0;line-height:1;}
+  .step .sx{flex:1;} .step .sn{font-size:15px;font-weight:600;color:var(--ink);}
+  .step .sd{font-size:13px;color:var(--ink-soft);margin-top:3px;line-height:1.5;}
+  .step .sw{display:inline-block;font-size:9px;letter-spacing:.14em;text-transform:uppercase;background:var(--mist);color:var(--peri-3);padding:3px 8px;border-radius:99px;font-weight:600;margin-top:6px;margin-right:5px;}
+  .cygnet{display:inline-block;font-size:9px;letter-spacing:.14em;text-transform:uppercase;background:var(--mist);color:var(--peri-3);padding:3px 8px;border-radius:99px;font-weight:600;margin-left:6px;vertical-align:middle;}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;}
+  .chip{appearance:none;border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.14);color:#fff;font-family:var(--sans);font-size:12px;font-weight:500;padding:9px 14px;border-radius:99px;cursor:pointer;}
+  .chip[aria-pressed=true]{background:#fff;color:var(--peri-3);border-color:#fff;}
+  .card .chip{border-color:rgba(90,99,196,.3);background:var(--mist);color:var(--ink);}
+  .card .chip[aria-pressed=true]{background:var(--peri-3);color:#fff;border-color:var(--peri-3);}
+  input[type=text],input[type=date],input[type=number],textarea,select{width:100%;font-family:var(--sans);font-size:15px;color:var(--ink);background:#F6F6FD;border:1px solid rgba(90,99,196,.22);border-radius:12px;padding:12px 13px;}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--peri-3);}
+  textarea{min-height:88px;resize:vertical;}
+  .fl{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;margin:14px 0 6px;display:block;}
+  .row2{display:flex;gap:10px;} .row2>div{flex:1;min-width:0;}
+  .cta{width:100%;background:var(--peri-3);color:#fff;border:none;border-radius:15px;padding:15px;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;margin-top:14px;}
+  .ghost{width:100%;background:transparent;color:var(--peri-3);border:1px solid rgba(90,99,196,.35);border-radius:15px;padding:13px;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;margin-top:9px;}
+  .link{background:none;border:none;color:var(--peri-3);font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;padding:0;}
+  .link.danger{color:var(--bad);}
+  .level{display:flex;gap:6px;margin-top:8px;}
+  .level button{flex:1;appearance:none;border:1px solid rgba(90,99,196,.22);background:#fff;border-radius:9px;padding:9px 2px;font-family:var(--sans);font-size:11px;font-weight:600;color:var(--ink-soft);cursor:pointer;}
+  .level button[aria-pressed=true]{background:var(--peri-3);color:#fff;border-color:var(--peri-3);}
+  .bar{height:4px;background:rgba(90,99,196,.15);border-radius:9px;overflow:hidden;margin-top:8px;}
+  .bar span{display:block;height:100%;background:var(--peri-2);border-radius:9px;}
+  .prod{padding:14px 0;border-bottom:1px solid rgba(90,99,196,.13);}
+  .prod:last-child{border-bottom:none;}
+  .prod .pn{font-size:15px;font-weight:600;color:var(--ink);display:flex;align-items:center;flex-wrap:wrap;gap:4px;}
+  .prod .pm{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+  .prod .pa{display:flex;gap:14px;margin-top:8px;flex-wrap:wrap;}
+  .tabs{position:fixed;bottom:0;left:0;right:0;z-index:10;display:flex;justify-content:center;background:rgba(255,255,255,.97);padding:10px 8px max(20px,env(safe-area-inset-bottom));box-shadow:0 -10px 30px -18px rgba(30,25,80,.4);}
+  .tabs .in{display:flex;width:100%;max-width:560px;}
+  .tab{flex:1;text-align:center;padding:6px 2px;cursor:pointer;border:none;background:none;font-family:var(--sans);}
+  .tab .ti{height:19px;display:flex;align-items:center;justify-content:center;} .tab svg{stroke:var(--ink-soft);}
+  .tab .tl{font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);margin-top:4px;font-weight:500;}
+  .tab.on .tl{color:var(--peri-3);font-weight:600;} .tab.on svg{stroke:var(--peri-3);}
+  .mebtn{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.95);border:none;font-family:var(--serif);font-size:20px;color:var(--peri-3);cursor:pointer;flex-shrink:0;margin-top:2px;box-shadow:0 8px 20px -10px rgba(30,25,80,.5);}
+  .cam{position:relative;border-radius:18px;overflow:hidden;background:#0E1030;aspect-ratio:3/4;}
+  .cam video,.cam canvas,.cam img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .cam .ghost{opacity:.35;pointer-events:none;}
+  .cam .guide{position:absolute;inset:0;pointer-events:none;}
+  .zoneg{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px;}
+  .zone{background:var(--mist);border-radius:13px;padding:12px;}
+  .zone .zn{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;}
+  .zone .zv{font-family:var(--serif);font-size:22px;color:var(--ink);margin-top:3px;}
+  .zone .zd{font-size:11px;color:var(--ink-soft);margin-top:2px;}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  .thumb{aspect-ratio:3/4;border-radius:12px;overflow:hidden;position:relative;background:var(--mist);cursor:pointer;border:2px solid transparent;}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .thumb.sel{border-color:var(--peri-3);}
+  .thumb .dt{position:absolute;bottom:0;left:0;right:0;padding:6px 7px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:linear-gradient(transparent,rgba(28,31,69,.75));}
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .cmp img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px;display:block;}
+  .cmp .cd{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);text-align:center;margin-top:5px;font-weight:600;}
+  .delta{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(90,99,196,.13);font-size:14px;}
+  .delta:last-child{border-bottom:none;}
+  .delta b{font-weight:600;}
+  .sig{display:inline-block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;background:var(--mist);color:var(--peri-3);padding:4px 9px;border-radius:99px;font-weight:600;margin:4px 4px 0 0;}
+  .tl-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid rgba(90,99,196,.13);}
+  .tl-item:last-child{border-bottom:none;}
+  .tl-item .tld{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;min-width:52px;padding-top:3px;}
+  .tl-item .tlt{font-size:14px;color:var(--ink);}
+  .micbtn{width:64px;height:64px;border-radius:50%;background:var(--peri-3);border:none;margin:14px auto 0;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 12px 26px -12px var(--peri-3);}
+  .micbtn.rec{background:var(--bad);animation:pulse 1.2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.07);}}
+  .view{display:none;} .view.on{display:block;}
+  .env{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px;}
+  .env div{background:var(--mist);border-radius:12px;padding:11px 8px;text-align:center;}
+  .env .ev{font-family:var(--serif);font-size:22px;color:var(--ink);} .env .el{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-top:2px;}
+  .modes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+  .mode{appearance:none;border:1px solid rgba(90,99,196,.22);background:#fff;border-radius:12px;padding:12px;text-align:left;cursor:pointer;font-family:var(--sans);}
+  .mode[aria-pressed=true]{background:var(--peri-3);border-color:var(--peri-3);} .mode[aria-pressed=true] *{color:#fff;}
+  .mode .mn{font-size:13px;font-weight:600;color:var(--ink);} .mode .md{font-size:11px;color:var(--ink-soft);margin-top:2px;}
+  .ob{padding:24px 0;}
+  .ob h2{font-family:var(--serif);font-size:38px;color:#fff;font-weight:400;line-height:1.05;}
+  .ob h2 em{font-style:italic;}
+  .ob p.lead{color:rgba(255,255,255,.8);font-size:15px;line-height:1.55;margin-top:12px;}
+  .obdots{display:flex;gap:6px;margin-bottom:18px;} .obdots span{width:22px;height:3px;border-radius:9px;background:rgba(255,255,255,.3);} .obdots span.on{background:#fff;}
+  .modal{position:fixed;inset:0;z-index:50;background:rgba(28,31,69,.45);display:none;align-items:flex-end;justify-content:center;}
+  .modal.on{display:flex;}
+  .sheet{background:#fff;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;border-radius:24px 24px 0 0;padding:22px 20px max(24px,env(safe-area-inset-bottom));}
+  .sheet h3{font-family:var(--serif);font-size:28px;font-weight:400;color:var(--ink);} .sheet h3 em{font-style:italic;color:var(--peri-3);}
+  .toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);z-index:60;background:var(--ink);color:#fff;padding:11px 16px;border-radius:99px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;max-width:90%;text-align:center;}
+  .toast.on{opacity:1;}
+  video#bcvid{width:100%;border-radius:12px;background:#000;margin-top:8px;}
+  .empty{color:var(--ink-soft);font-size:14px;line-height:1.5;}
 </style>
 </head>
 <body>
-
-<div class="brandbar">
-  <h1><svg width="52" height="34" viewBox="0 0 240 150" fill="none" style="vertical-align:-4px;margin-right:6px;">
-    <path d="M22 112c0-30 26-52 60-52 14 0 26 3 38 7 9 3 16 4 22 1 9-4 12-14 9-24-2-8-8-14-16-16-7-2-13 0-17 4-3 3-4 7-3 11" fill="#fff" fill-opacity="0.92"/>
-    <path d="M22 112c14 11 36 17 62 17 40 0 72-20 84-48-16 12-38 19-62 19-32 0-60-12-84 12z" fill="#fff" fill-opacity="0.92"/>
-    <path d="M113 41l-10 3 10 3z" fill="#C3B9F2"/>
-    <circle cx="123" cy="35" r="2.4" fill="#0E1030"/>
-  </svg>Linden<em>.</em></h1>
-  <p>Read your skin</p>
+<div class="mesh"></div>
+<div class="feathers">
+  <svg viewBox="0 0 60 150" class="fth f1"><path d="M30 4c14 22 16 62 6 92-4 12-9 22-14 30-1-9-2-19-2-30 0-42 4-72 10-92z" fill="#fff" fill-opacity=".5"/><path d="M30 8v112" stroke="#fff" stroke-opacity=".55" stroke-width="1"/><g stroke="#fff" stroke-opacity=".32" stroke-width=".7"><path d="M30 26l12 8M30 40l13 8M30 54l12 9M30 68l11 9M30 82l9 8M30 26L18 34M30 40l-13 8M30 54l-12 9M30 68l-11 9M30 82l-9 8"/></g></svg>
+  <svg viewBox="0 0 60 150" class="fth f2"><path d="M30 4c14 22 16 62 6 92-4 12-9 22-14 30-1-9-2-19-2-30 0-42 4-72 10-92z" fill="#fff" fill-opacity=".5"/><path d="M30 8v112" stroke="#fff" stroke-opacity=".55" stroke-width="1"/><g stroke="#fff" stroke-opacity=".32" stroke-width=".7"><path d="M30 26l12 8M30 40l13 8M30 54l12 9M30 68l11 9M30 26L18 34M30 40l-13 8M30 54l-12 9M30 68l-11 9"/></g></svg>
+  <svg viewBox="0 0 60 150" class="fth f3"><path d="M30 4c14 22 16 62 6 92-4 12-9 22-14 30-1-9-2-19-2-30 0-42 4-72 10-92z" fill="#fff" fill-opacity=".5"/><path d="M30 8v112" stroke="#fff" stroke-opacity=".55" stroke-width="1"/><g stroke="#fff" stroke-opacity=".3" stroke-width=".7"><path d="M30 26l12 8M30 40l13 8M30 54l12 9M30 26L18 34M30 40l-13 8M30 54l-12 9"/></g></svg>
 </div>
+<div class="swanlayer">
+  <svg class="swan" id="swanA" viewBox="0 0 240 150" fill="none"><path d="M22 112c0-30 26-52 60-52 14 0 26 3 38 7 9 3 16 4 22 1 9-4 12-14 9-24-2-8-8-14-16-16-7-2-13 0-17 4-3 3-4 7-3 11" fill="#fff" fill-opacity=".30"/><path d="M22 112c0-30 26-52 60-52 14 0 26 3 38 7 9 3 16 4 22 1 9-4 12-14 9-24-2-8-8-14-16-16-7-2-13 0-17 4-3 3-4 7-3 11" stroke="#fff" stroke-opacity=".75" stroke-width="2"/><path d="M22 112c14 11 36 17 62 17 40 0 72-20 84-48-16 12-38 19-62 19-32 0-60-12-84 12z" fill="#fff" fill-opacity=".30" stroke="#fff" stroke-opacity=".6" stroke-width="1.6"/><path d="M112 41l-9 3 9 3" fill="#fff" fill-opacity=".55"/><circle cx="123" cy="35" r="2.1" fill="#fff" fill-opacity=".9"/></svg>
+  <svg class="swan" id="swanB" viewBox="0 0 240 150" fill="none"><path d="M22 112c0-30 26-52 60-52 14 0 26 3 38 7 9 3 16 4 22 1 9-4 12-14 9-24-2-8-8-14-16-16-7-2-13 0-17 4-3 3-4 7-3 11" fill="#fff" fill-opacity=".26"/><path d="M22 112c14 11 36 17 62 17 40 0 72-20 84-48-16 12-38 19-62 19-32 0-60-12-84 12z" fill="#fff" fill-opacity=".26"/><circle cx="123" cy="35" r="2" fill="#fff" fill-opacity=".7"/></svg>
+</div>
+<div class="grain"></div>
 
-<div class="phone" id="phone">
-  <div class="screen">
-    <div class="mesh"></div>
-    <div class="swanlayer">
-      <svg class="swan" id="swanA" viewBox="0 0 240 150" fill="none">
-        <path d="M22 112c0-30 26-52 60-52 14 0 26 3 38 7 9 3 16 4 22 1 9-4 12-14 9-24-2-8-8-14-16-16-7-2-13 0-17 4-3 3-4 7-3 11" fill="#fff" fill-opacity="0.30"/>
-        <path d="M22 112c0-30 26-52 60-52 14 0 26 3 38 7 9 3 16 4 22 1 9-4 12-14 9-24-2-8-8-14-16-16-7-2-13 0-17 4-3 3-4 7-3 11" stroke="#fff" stroke-opacity="0.75" stroke-width="2"/>
-        <path d="M22 112c14 11 36 17 62 17 40 0 72-20 84-48-16 12-38 19-62 19-32 0-60-12-84 12z" fill="#fff" fill-opacity="0.30" stroke="#fff" stroke-opacity="0.6" stroke-width="1.6"/>
-        <path d="M118 39c-5-2-9-1-11 2" stroke="#fff" stroke-opacity="0.7" stroke-width="2" stroke-linecap="round"/>
-        <path d="M112 41l-9 3 9 3" fill="#fff" fill-opacity="0.55"/>
-        <circle cx="123" cy="35" r="2.1" fill="#fff" fill-opacity="0.9"/>
-        <path d="M60 78c14-7 34-8 50-3" stroke="#fff" stroke-opacity="0.4" stroke-width="1.3" stroke-linecap="round"/>
-        <path d="M52 92c16-8 38-9 56-4" stroke="#fff" stroke-opacity="0.3" stroke-width="1.2" stroke-linecap="round"/>
-      </svg>
-      <svg class="swan two" id="swanB" viewBox="0 0 240 150" fill="none">
-        <path d="M22 112c0-30 26-52 60-52 14 0 26 3 38 7 9 3 16 4 22 1 9-4 12-14 9-24-2-8-8-14-16-16-7-2-13 0-17 4-3 3-4 7-3 11" fill="#fff" fill-opacity="0.26"/>
-        <path d="M22 112c14 11 36 17 62 17 40 0 72-20 84-48-16 12-38 19-62 19-32 0-60-12-84 12z" fill="#fff" fill-opacity="0.26"/>
-        <circle cx="123" cy="35" r="2" fill="#fff" fill-opacity="0.7"/>
-      </svg>
-    </div>
-    <div class="feathers">
-      <svg viewBox="0 0 60 150" class="fth f1"><path d="M30 4c14 22 16 62 6 92-4 12-9 22-14 30-1-9-2-19-2-30 0-42 4-72 10-92z" fill="#fff" fill-opacity="0.5"/><path d="M30 8v112" stroke="#fff" stroke-opacity="0.55" stroke-width="1"/><g stroke="#fff" stroke-opacity="0.32" stroke-width="0.7"><path d="M30 26l12 8M30 40l13 8M30 54l12 9M30 68l11 9M30 82l9 8M30 96l7 8M30 26L18 34M30 40l-13 8M30 54l-12 9M30 68l-11 9M30 82l-9 8M30 96l-7 8"/></g></svg>
-      <svg viewBox="0 0 60 150" class="fth f2"><path d="M30 4c14 22 16 62 6 92-4 12-9 22-14 30-1-9-2-19-2-30 0-42 4-72 10-92z" fill="#fff" fill-opacity="0.5"/><path d="M30 8v112" stroke="#fff" stroke-opacity="0.55" stroke-width="1"/><g stroke="#fff" stroke-opacity="0.32" stroke-width="0.7"><path d="M30 26l12 8M30 40l13 8M30 54l12 9M30 68l11 9M30 82l9 8M30 26L18 34M30 40l-13 8M30 54l-12 9M30 68l-11 9M30 82l-9 8"/></g></svg>
-      <svg viewBox="0 0 60 150" class="fth f3"><path d="M30 4c14 22 16 62 6 92-4 12-9 22-14 30-1-9-2-19-2-30 0-42 4-72 10-92z" fill="#fff" fill-opacity="0.5"/><path d="M30 8v112" stroke="#fff" stroke-opacity="0.55" stroke-width="1"/><g stroke="#fff" stroke-opacity="0.3" stroke-width="0.7"><path d="M30 26l12 8M30 40l13 8M30 54l12 9M30 68l11 9M30 26L18 34M30 40l-13 8M30 54l-12 9M30 68l-11 9"/></g></svg>
-      <svg viewBox="0 0 60 150" class="fth f4"><path d="M30 4c14 22 16 62 6 92-4 12-9 22-14 30-1-9-2-19-2-30 0-42 4-72 10-92z" fill="#fff" fill-opacity="0.45"/><path d="M30 8v112" stroke="#fff" stroke-opacity="0.5" stroke-width="1"/><g stroke="#fff" stroke-opacity="0.28" stroke-width="0.7"><path d="M30 30l12 8M30 44l13 8M30 58l12 9M30 30L18 38M30 44l-13 8M30 58l-12 9"/></g></svg>
-    </div>
-    <div class="grain"></div>
-
-    <div class="inner">
-      <div class="head">
-        <div class="greet">Good morning, <em>Sonum</em></div>
-        <div class="date">Saturday, 22 August</div>
-      </div>
-
-      <div class="scroll" id="scroll">
-
-        <!-- TODAY -->
-        <div class="view on" id="v-today">
-          <div class="label">This morning <span class="pill">AM routine</span></div>
-          <div class="card">
-            <div class="k">Step one of four</div>
-            <div class="t">Gentle cleanse, then <em>vitamin C</em></div>
-            <p>Four to five drops, pressed not rubbed. Give it a minute before the next layer.</p>
-            <div class="bar" style="margin-top:14px;"><span style="width:25%"></span></div>
-          </div>
-
-          <div class="label">Worth knowing</div>
-          <div class="card">
-            <div class="flag">
-              <div class="dot" style="background:#C4635F"></div>
-              <div class="fx">
-                <div class="fn">Retinal and your acid toner clash</div>
-                <div class="fd">Both on Tuesday nights. Move the toner to Thursday and your barrier will thank you.</div>
-              </div>
-            </div>
-            <div class="flag">
-              <div class="dot" style="background:#C99A4E"></div>
-              <div class="fx">
-                <div class="fn">SPF runs out in about 12 days</div>
-                <div class="fd">At your logged rate. Your backup expired in March.</div>
-              </div>
-            </div>
-            <div class="flag">
-              <div class="dot" style="background:#6E9C74"></div>
-              <div class="fx">
-                <div class="fn">Redness down 18 percent since June</div>
-                <div class="fd">Six weeks after you started the azelaic acid. Worth keeping.</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="label">Today's mode</div>
-          <div class="card">
-            <div class="k">Tap to switch</div>
-            <div class="t">Barrier repair <em>day</em></div>
-            <p>Skipping actives entirely. Cleanse, hydrate, occlude, sleep.</p>
-          </div>
-        </div>
-
-        <!-- READ -->
-        <div class="view" id="v-read">
-          <div class="label">Your reading <span class="pill">22 Aug</span></div>
-          <div class="card">
-            <div class="k">Measured, not diagnosed</div>
-            <div class="t">Calmer than <em>last week</em></div>
-            <p>Redness has eased across the cheeks. Texture is holding steady. Shine is up slightly in the T-zone, which tracks with the heat.</p>
-            <div class="zonegrid">
-              <div class="zone"><div class="zn">Cheeks</div><div class="zv">Calm</div><div class="bar"><span style="width:26%"></span></div></div>
-              <div class="zone"><div class="zn">T-zone</div><div class="zv">Shiny</div><div class="bar"><span style="width:71%"></span></div></div>
-              <div class="zone"><div class="zn">Chin</div><div class="zv">2 spots</div><div class="bar"><span style="width:38%"></span></div></div>
-              <div class="zone"><div class="zn">Under-eye</div><div class="zv">Softer</div><div class="bar"><span style="width:44%"></span></div></div>
-            </div>
-          </div>
-          <div class="label">Integrity check</div>
-          <div class="card">
-            <div class="flag">
-              <div class="dot" style="background:#6E9C74"></div>
-              <div class="fx">
-                <div class="fn">Comparable to your last photo</div>
-                <div class="fd">Same lighting, same distance, same time of day. This change is real, not a trick of the light.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- SHELF -->
-        <div class="view" id="v-shelf">
-          <div class="label">Your shelf <span class="pill">14 products</span></div>
-          <div class="card">
-            <div class="k">Before you buy anything</div>
-            <div class="t">What are you <em>solving?</em></div>
-            <p>Tell me the problem and I will check what you already own before recommending a single thing.</p>
-            <button class="cta">Build from what I own</button>
-          </div>
-          <div class="card">
-            <div class="flag">
-              <div class="dot" style="background:#5A63C4"></div>
-              <div class="fx">
-                <div class="fn">Azelaic acid 10% <span class="cygnet">Cygnet</span></div>
-                <div class="fd">Week 3 of phasing in. Three nights a week until the 30th, then every other night.</div>
-              </div>
-            </div>
-            <div class="flag">
-              <div class="dot" style="background:#C4635F"></div>
-              <div class="fx">
-                <div class="fn">Two products doing the same job</div>
-                <div class="fd">Your niacinamide serum and your moisturiser both cover it. One is enough.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- SWANS -->
-        <div class="view" id="v-swans">
-          <div class="label">The Swans <span class="pill">18 photos</span></div>
-          <div class="card">
-            <div class="k">Same light, same angle</div>
-            <div class="t">Ten weeks, <em>side by side</em></div>
-            <p>Take today's in the same window as always. I will line it up against the last one for you.</p>
-            <div class="swanrow" style="margin-top:15px;">
-              <div class="swanshot new">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5A63C4" stroke-width="1.5">
-                  <circle cx="12" cy="13" r="4"/><path d="M3 8h4l2-3h6l2 3h4v11H3z" stroke-linejoin="round"/>
-                </svg>
-              </div>
-              <div class="swanshot"><div class="dt">15 Aug</div></div>
-              <div class="swanshot"><div class="dt">1 Aug</div></div>
-              <div class="swanshot"><div class="dt">18 Jul</div></div>
-              <div class="swanshot"><div class="dt">4 Jul</div></div>
-            </div>
-          </div>
-          <div class="label">Ask your history</div>
-          <div class="card">
-            <div class="t" style="font-size:21px;">"When was my skin <em>last this calm?</em>"</div>
-            <p>Early June, before the sunscreen changed. You were on the same routine you are on now, minus the new oil.</p>
-          </div>
-        </div>
-
-        <!-- DIARY -->
-        <div class="view" id="v-diary">
-          <div class="label">Skin diary</div>
-          <div class="card">
-            <div class="k">Hold to speak</div>
-            <div class="t">How is it <em>feeling?</em></div>
-            <p>"Tight but oily, stung a bit after moisturiser, slept badly." I will file that properly.</p>
-            <button class="cta">Hold to record</button>
-            <button class="ghost" style="color:var(--peri-3);border-color:rgba(90,99,196,0.35);">Type instead</button>
-          </div>
-          <div class="label">Filed from Tuesday</div>
-          <div class="card">
-            <div class="flag">
-              <div class="dot" style="background:#C99A4E"></div>
-              <div class="fx">
-                <div class="fn">Stinging on application</div>
-                <div class="fd">Logged as a barrier signal. Third time this month, always after the acid toner.</div>
-              </div>
-            </div>
-            <div class="flag">
-              <div class="dot" style="background:#8C8FB8"></div>
-              <div class="fx">
-                <div class="fn">Poor sleep, day three</div>
-                <div class="fd">Noted alongside the flare on your chin.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="tabs">
-        <button class="tab on" data-v="today"><div class="ti"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M4 12h4l3-8 4 16 3-8h2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="tl">Today</div></button>
-        <button class="tab" data-v="read"><div class="ti"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round"/></svg></div><div class="tl">Read</div></button>
-        <button class="tab" data-v="shelf"><div class="ti"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="5" y="3" width="6" height="18" rx="2"/><rect x="14" y="8" width="5" height="13" rx="2"/></svg></div><div class="tl">Shelf</div></button>
-        <button class="tab" data-v="swans"><div class="ti"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M4 18c0-5 4-9 9-9 4 0 5 2 7 2 2 0 3-1 3-3s-2-3-3-2" stroke-linecap="round"/><path d="M4 18c2 2 5 3 9 3 6 0 10-4 11-8" stroke-linecap="round"/></svg></div><div class="tl">Swans</div></button>
-        <button class="tab" data-v="diary"><div class="ti"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3" stroke-linecap="round"/></svg></div><div class="tl">Diary</div></button>
-      </div>
-    </div>
-
-    <div class="fog" id="fog">
-      <div class="pane top"></div>
-      <div class="pane bot"></div>
-      <div class="waterline"></div>
-      <svg class="glider" viewBox="0 0 240 150" fill="none">
-        <path d="M22 112c0-30 26-52 60-52 14 0 26 3 38 7 9 3 16 4 22 1 9-4 12-14 9-24-2-8-8-14-16-16-7-2-13 0-17 4-3 3-4 7-3 11" fill="#fff"/>
-        <path d="M22 112c0-30 26-52 60-52 14 0 26 3 38 7 9 3 16 4 22 1 9-4 12-14 9-24-2-8-8-14-16-16-7-2-13 0-17 4-3 3-4 7-3 11" stroke="#5A63C4" stroke-width="2"/>
-        <path d="M22 112c14 11 36 17 62 17 40 0 72-20 84-48-16 12-38 19-62 19-32 0-60-12-84 12z" fill="#fff" stroke="#5A63C4" stroke-width="1.8"/>
-        <path d="M118 39c-5-2-9-1-11 2" stroke="#5A63C4" stroke-width="2" stroke-linecap="round"/>
-        <path d="M113 41l-10 3 10 3z" fill="#C99A4E"/>
-        <circle cx="123" cy="35" r="2.2" fill="#1C1F45"/>
-        <path d="M60 78c14-7 34-8 50-3" stroke="#5A63C4" stroke-opacity="0.4" stroke-width="1.3" stroke-linecap="round"/>
-      </svg>
-      <div class="mark">
-        <svg width="128" height="80" viewBox="0 0 240 150" fill="none" style="margin-bottom:10px;">
-          <path d="M22 112c0-30 26-52 60-52 14 0 26 3 38 7 9 3 16 4 22 1 9-4 12-14 9-24-2-8-8-14-16-16-7-2-13 0-17 4-3 3-4 7-3 11" fill="#fff" fill-opacity="0.8"/>
-          <path d="M22 112c0-30 26-52 60-52 14 0 26 3 38 7 9 3 16 4 22 1 9-4 12-14 9-24-2-8-8-14-16-16-7-2-13 0-17 4-3 3-4 7-3 11" stroke="#5A63C4" stroke-width="2.2"/>
-          <path d="M22 112c14 11 36 17 62 17 40 0 72-20 84-48-16 12-38 19-62 19-32 0-60-12-84 12z" fill="#fff" fill-opacity="0.8" stroke="#5A63C4" stroke-width="1.9"/>
-          <path d="M118 39c-5-2-9-1-11 2" stroke="#5A63C4" stroke-width="2" stroke-linecap="round"/>
-          <path d="M113 41l-10 3 10 3z" fill="#C99A4E"/>
-          <circle cx="123" cy="35" r="2.2" fill="#1C1F45"/>
-        </svg>
-        <div class="fw">Linden<em>.</em></div>
-        <div class="fs">Read your skin</div>
-      </div>
-    </div>
-    </div>
+<div class="fog" id="fog">
+  <div class="pane top"></div><div class="pane bot"></div><div class="waterline"></div>
+  <svg class="glider" viewBox="0 0 240 150" fill="none"><path d="M22 112c0-30 26-52 60-52 14 0 26 3 38 7 9 3 16 4 22 1 9-4 12-14 9-24-2-8-8-14-16-16-7-2-13 0-17 4-3 3-4 7-3 11" fill="#fff" stroke="#5A63C4" stroke-width="2"/><path d="M22 112c14 11 36 17 62 17 40 0 72-20 84-48-16 12-38 19-62 19-32 0-60-12-84 12z" fill="#fff" stroke="#5A63C4" stroke-width="1.8"/><path d="M113 41l-10 3 10 3z" fill="#C99A4E"/><circle cx="123" cy="35" r="2.2" fill="#1C1F45"/></svg>
+  <div class="mark">
+    <svg width="128" height="80" viewBox="0 0 240 150" fill="none" style="margin-bottom:10px;"><path d="M22 112c0-30 26-52 60-52 14 0 26 3 38 7 9 3 16 4 22 1 9-4 12-14 9-24-2-8-8-14-16-16-7-2-13 0-17 4-3 3-4 7-3 11" fill="#fff" fill-opacity=".8" stroke="#5A63C4" stroke-width="2.2"/><path d="M22 112c14 11 36 17 62 17 40 0 72-20 84-48-16 12-38 19-62 19-32 0-60-12-84 12z" fill="#fff" fill-opacity=".8" stroke="#5A63C4" stroke-width="1.9"/><path d="M113 41l-10 3 10 3z" fill="#C99A4E"/><circle cx="123" cy="35" r="2.2" fill="#1C1F45"/></svg>
+    <div class="fw">Linden<em>.</em></div><div class="fs">Read your skin</div>
   </div>
 </div>
 
-<div class="note"><b style="color:#fff;">This is a design prototype, not a working app.</b><br>
-Tap the tabs to move between screens. Tap the periwinkle to drop a feather.</div>
-<button class="replay" id="replay">Replay the opening</button>
+<div class="app">
+  <div class="head" style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;"><div><div class="greet" id="greet">Linden<em>.</em></div><div class="date" id="today-date"></div></div><button class="mebtn" id="me-btn" aria-label="You" hidden></button></div>
+  <div class="content" id="content"></div>
+</div>
+
+<div class="tabs" id="tabs" hidden><div class="in">
+  <button class="tab on" data-v="today"><div class="ti"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M4 12h4l3-8 4 16 3-8h2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="tl">Today</div></button>
+  <button class="tab" data-v="shelf"><div class="ti"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="5" y="3" width="6" height="18" rx="2"/><rect x="14" y="8" width="5" height="13" rx="2"/></svg></div><div class="tl">Shelf</div></button>
+  <button class="tab" data-v="read"><div class="ti"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><circle cx="12" cy="13" r="4"/><path d="M3 8h4l2-3h6l2 3h4v11H3z" stroke-linejoin="round"/></svg></div><div class="tl">Read</div></button>
+  <button class="tab" data-v="swans"><div class="ti"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M4 18c0-5 4-9 9-9 4 0 5 2 7 2 2 0 3-1 3-3s-2-3-3-2" stroke-linecap="round"/><path d="M4 18c2 2 5 3 9 3 6 0 10-4 11-8" stroke-linecap="round"/></svg></div><div class="tl">Swans</div></button>
+  <button class="tab" data-v="diary"><div class="ti"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3" stroke-linecap="round"/></svg></div><div class="tl">Diary</div></button>
+</div></div>
+
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
 
 <script>
-  var fog=document.getElementById("fog");
-  function openApp(){
-    // panes snap shut with no transition, so the surface is simply already there
-    fog.classList.remove("armed");
-    fog.classList.remove("clear");
-    fog.classList.remove("glide");
-    void fog.offsetWidth;
-    // then: swan glides across the still surface
-    setTimeout(function(){ fog.classList.add("glide"); },500);
-    // then, and only then, the surface parts
-    setTimeout(function(){ fog.classList.add("armed"); void fog.offsetWidth; fog.classList.add("clear"); },2300);
+/* ================= storage ================= */
+var store={get:function(k){try{var v=localStorage.getItem(k);return v?JSON.parse(v):null;}catch(e){return null;}},set:function(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+var S=store.get("linden")||{profile:null,products:[],routine:{am:[],pm:[]},mode:"normal",logs:[],env:null,loc:null,diary:[]};
+function save(){ store.set("linden",S); }
+function el(id){return document.getElementById(id);}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function todayISO(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function daysBetween(a,b){return Math.round((new Date(b+"T12:00:00")-new Date(a+"T12:00:00"))/86400000);}
+function addDays(iso,n){var d=new Date(iso+"T12:00:00");d.setDate(d.getDate()+n);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function fmt(iso){if(!iso)return "";return new Date(iso+"T12:00:00").toLocaleDateString(undefined,{day:"numeric",month:"short"});}
+function toast(m){var t=el("toast");t.textContent=m;t.classList.add("on");clearTimeout(t._x);t._x=setTimeout(function(){t.classList.remove("on");},2400);}
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+
+/* ================= product categories ================= */
+var CATS={
+  cleanser:{label:"Cleanser",order:10,am:1,pm:1,dose:"A coin-sized amount, worked into damp skin for a full minute.",where:"Full face, down to the jaw. Rinse thoroughly.",pao:12,window:2},
+  toner:{label:"Toner or essence",order:20,am:1,pm:1,dose:"A few drops pressed in with your hands, or a lightly damp pad.",where:"Full face, avoiding the eye area.",pao:12,window:4},
+  vitc:{label:"Vitamin C serum",order:30,am:1,pm:0,dose:"Four to five drops. Press in, do not rub.",where:"Full face and neck, avoiding the immediate eye area.",pao:3,window:10},
+  exfoliant:{label:"Acid or exfoliant",order:32,am:0,pm:1,dose:"A thin layer, or a few drops. Less than you think.",where:"Full face, avoiding the eye area and the corners of the nose and mouth.",pao:12,window:6},
+  azelaic:{label:"Azelaic acid",order:34,am:1,pm:1,dose:"A pea-sized amount for the whole face.",where:"Full face, or spot-targeted on red areas.",pao:12,window:10},
+  niacinamide:{label:"Niacinamide serum",order:36,am:1,pm:1,dose:"Three to four drops.",where:"Full face.",pao:12,window:8},
+  serum:{label:"Other serum",order:38,am:1,pm:1,dose:"Three to four drops, or a pea for gels.",where:"Full face.",pao:12,window:6},
+  retinoid:{label:"Retinoid",order:40,am:0,pm:1,dose:"One pea-sized amount for the whole face. Not more.",where:"Full face, avoiding the eyelids, nostril edges and corners of the mouth. Wait until skin is fully dry.",pao:9,window:12},
+  bp:{label:"Benzoyl peroxide",order:42,am:1,pm:1,dose:"A thin layer. It bleaches fabric, so mind your pillowcase.",where:"Spot treatment, or a thin layer over breakout-prone areas only.",pao:12,window:6},
+  eye:{label:"Eye cream",order:50,am:1,pm:1,dose:"A grain of rice per eye, tapped with your ring finger.",where:"Along the orbital bone only. Never on the lid, it migrates.",pao:6,window:6},
+  moisturiser:{label:"Moisturiser",order:60,am:1,pm:1,dose:"An almond-sized amount.",where:"Full face and neck.",pao:12,window:3},
+  oil:{label:"Face oil",order:70,am:0,pm:1,dose:"Two to three drops, pressed in as the last step.",where:"Full face, or just the dry areas.",pao:12,window:4},
+  spf:{label:"Sunscreen",order:80,am:1,pm:0,dose:"Two full finger-lengths for the face alone, about a quarter teaspoon. Most people use a third of this.",where:"Face, neck, ears, and the backs of your hands. Reapply every two hours in the sun.",pao:12,window:0},
+  mask:{label:"Mask or treatment",order:35,am:0,pm:1,dose:"As directed, once or twice a week at most.",where:"Full face, or the areas it is for.",pao:12,window:4},
+  spot:{label:"Spot treatment",order:44,am:1,pm:1,dose:"A tiny dab on the spot itself.",where:"The spot only. Not the area around it.",pao:12,window:2}
+};
+
+/* ================= ingredient tags ================= */
+var TAGRULES=[
+  ["retinoid",/\b(retinol|retinal|retinaldehyde|tretinoin|adapalene|tazarotene|retinyl|hydroxypinacolone retinoate|granactive)\b/i],
+  ["aha",/\b(glycolic|lactic|mandelic|malic|tartaric|citric acid)\b/i],
+  ["bha",/\b(salicylic|betaine salicylate)\b/i],
+  ["pha",/\b(gluconolactone|lactobionic|galactose)\b/i],
+  ["vitc",/\b(ascorbic|ascorbyl|ascorbate|ethyl ascorbic|tetrahexyldecyl)\b/i],
+  ["bp",/\bbenzoyl peroxide\b/i],
+  ["niacinamide",/\bniacinamide\b/i],
+  ["azelaic",/\bazelaic\b/i],
+  ["copper",/\bcopper (tri)?peptide|ghk-cu\b/i],
+  ["peptide",/\bpeptide|palmitoyl\b/i],
+  ["spf",/\b(avobenzone|octocrylene|homosalate|octisalate|oxybenzone|zinc oxide|titanium dioxide|tinosorb|bemotrizinol|bisoctrizole|ensulizole|spf)\b/i],
+  ["fragrance",/\b(fragrance|parfum|perfume|linalool|limonene|citronellol|geraniol|eugenol)\b/i],
+  ["alcohol",/\b(alcohol denat|denatured alcohol|sd alcohol|ethanol)\b/i],
+  ["oil",/\b(petrolatum|mineral oil|squalane|shea|jojoba|argan|rosehip|marula|coconut oil|dimethicone)\b/i],
+  ["hydroquinone",/\bhydroquinone\b/i],
+  ["tranexamic",/\btranexamic\b/i],
+  ["sulfur",/\bsulfur|sulphur\b/i],
+  ["ceramide",/\bceramide\b/i],
+  ["ha",/\bhyaluron|sodium hyaluronate\b/i]
+];
+var TAGNAMES={retinoid:"retinoid",aha:"AHA",bha:"BHA",pha:"PHA",vitc:"vitamin C",bp:"benzoyl peroxide",niacinamide:"niacinamide",azelaic:"azelaic acid",copper:"copper peptides",peptide:"peptides",spf:"SPF",fragrance:"fragrance",alcohol:"drying alcohol",oil:"oils or occlusives",hydroquinone:"hydroquinone",tranexamic:"tranexamic acid",sulfur:"sulfur",ceramide:"ceramides",ha:"hyaluronic acid"};
+function detectTags(ings,cat){
+  var t={};
+  TAGRULES.forEach(function(r){ if(r[1].test(ings||"")) t[r[0]]=1; });
+  // the category implies the active even without a pasted list
+  if(cat==="retinoid") t.retinoid=1;
+  if(cat==="vitc") t.vitc=1;
+  if(cat==="bp") t.bp=1;
+  if(cat==="azelaic") t.azelaic=1;
+  if(cat==="niacinamide") t.niacinamide=1;
+  if(cat==="spf") t.spf=1;
+  if(cat==="exfoliant"&&!t.aha&&!t.bha&&!t.pha) t.aha=1;
+  return Object.keys(t);
+}
+var ACTIVE_TAGS={retinoid:1,aha:1,bha:1,pha:1,vitc:1,bp:1,azelaic:1,hydroquinone:1};
+var EXFOL_TAGS={retinoid:1,aha:1,bha:1,pha:1};
+
+/* ================= conflicts ================= */
+var CONFLICTS=[
+  {a:"retinoid",b:"aha",sev:"bad",why:"Two exfoliating actives in one routine is how barriers get wrecked. Alternate nights instead."},
+  {a:"retinoid",b:"bha",sev:"bad",why:"Retinoid and salicylic acid together compound irritation. Different nights."},
+  {a:"retinoid",b:"pha",sev:"warn",why:"Gentler than the other acids, but still an exfoliant on top of a retinoid. Alternate if your skin is reactive."},
+  {a:"retinoid",b:"bp",sev:"warn",why:"Benzoyl peroxide can deactivate some retinoids (adapalene is fine). Use them at opposite ends of the day."},
+  {a:"retinoid",b:"vitc",sev:"warn",why:"Both are strong. Vitamin C in the morning, retinoid at night, and they never meet."},
+  {a:"vitc",b:"aha",sev:"warn",why:"Layering acids on vitamin C ramps irritation without helping either. Split them across the day."},
+  {a:"vitc",b:"bha",sev:"warn",why:"Same story: split them across the day."},
+  {a:"vitc",b:"bp",sev:"bad",why:"Benzoyl peroxide oxidises vitamin C, which cancels it out. Never in the same routine."},
+  {a:"vitc",b:"copper",sev:"warn",why:"Copper peptides and vitamin C are thought to undermine each other. Keep them apart."},
+  {a:"aha",b:"bha",sev:"warn",why:"Two acids at once is over-exfoliation for most skin. Pick one per night."},
+  {a:"bp",b:"aha",sev:"warn",why:"Two drying actives. Fine for oily, resilient skin; harsh for everyone else."},
+  {a:"copper",b:"aha",sev:"warn",why:"Acids can destabilise copper peptides."},
+  {a:"hydroquinone",b:"bp",sev:"bad",why:"Benzoyl peroxide can stain skin when combined with hydroquinone. Keep them well apart."},
+  {a:"niacinamide",b:"vitc",sev:"info",why:"An old myth says these clash. At normal concentrations they are fine together."}
+];
+function findConflicts(ids){
+  var prods=ids.map(getProduct).filter(Boolean), out=[];
+  for(var i=0;i<prods.length;i++)for(var j=i+1;j<prods.length;j++){
+    CONFLICTS.forEach(function(c){
+      var ok=(prods[i].tags.indexOf(c.a)>-1&&prods[j].tags.indexOf(c.b)>-1)||(prods[i].tags.indexOf(c.b)>-1&&prods[j].tags.indexOf(c.a)>-1);
+      if(ok&&c.sev!=="info") out.push({sev:c.sev,p1:prods[i],p2:prods[j],why:c.why});
+    });
   }
-  openApp();
-  document.getElementById("replay").onclick=openApp;
-
-  document.querySelectorAll(".tab").forEach(function(t){
-    t.onclick=function(){
-      document.querySelectorAll(".tab").forEach(function(x){x.classList.remove("on");});
-      document.querySelectorAll(".view").forEach(function(x){x.classList.remove("on");});
-      t.classList.add("on");
-      document.getElementById("v-"+t.dataset.v).classList.add("on");
-      document.getElementById("scroll").scrollTop=0;
-    };
+  return out;
+}
+/* ================= shelf intelligence ================= */
+function getProduct(id){ return S.products.filter(function(p){return p.id===id;})[0]; }
+function activeProducts(){ return S.products.filter(function(p){return p.status!=="retired";}); }
+function expiryDate(p){ if(!p.opened)return null; var cat=CATS[p.cat]||CATS.serum; var m=p.pao||cat.pao; var d=new Date(p.opened+"T12:00:00"); d.setMonth(d.getMonth()+m); return d.toISOString().slice(0,10); }
+function usageRate(p){
+  // days per percent, from the level log slope
+  var log=(p.levelLog||[]).slice().sort(function(a,b){return a.date<b.date?-1:1;});
+  if(log.length<2) return null;
+  var first=log[0], last=log[log.length-1];
+  var days=daysBetween(first.date,last.date), drop=first.level-last.level;
+  if(days<7||drop<=0) return null;
+  return {daysPerPct:days/drop, daysLeft:Math.round((last.level)*(days/drop))};
+}
+function daysOnShelf(p){ return p.added?daysBetween(p.added,todayISO()):0; }
+function judgement(p){
+  var cat=CATS[p.cat]||CATS.serum; var weeks=cat.window; if(!weeks) return null;
+  var start=p.started||p.added; if(!start) return null;
+  var verdictDate=addDays(start,weeks*7); var left=daysBetween(todayISO(),verdictDate);
+  return {weeks:weeks,verdict:verdictDate,left:left,ready:left<=0};
+}
+function lastUsed(p){
+  var last=null;
+  S.logs.forEach(function(l){ if((l.am||[]).indexOf(p.id)>-1||(l.pm||[]).indexOf(p.id)>-1){ if(!last||l.date>last) last=l.date; } });
+  return last;
+}
+function dormant(){
+  var t=todayISO();
+  return activeProducts().filter(function(p){
+    var lu=lastUsed(p); var ref=lu||p.added; if(!ref) return false;
+    return daysBetween(ref,t)>=42 && S.logs.length>=10;
   });
+}
+/* ================= active load ================= */
+function activeLoad(){
+  // exfoliating applications per week, across the whole shelf
+  var nights=0, items=[];
+  activeProducts().forEach(function(p){
+    var ex=p.tags.some(function(t){return EXFOL_TAGS[t];});
+    if(!ex) return;
+    var f=p.freq||((S.routine.pm.indexOf(p.id)>-1||S.routine.am.indexOf(p.id)>-1)?7:0);
+    if(f>0){ nights+=f; items.push(p.name+" ("+f+" a week)"); }
+  });
+  var limit=(S.profile&&S.profile.sens==="reactive")?2:(S.profile&&S.profile.sens==="sensitive")?3:5;
+  return {nights:nights,limit:limit,items:items,over:nights>limit};
+}
+/* ================= ordering ================= */
+function orderRoutine(ids){
+  return ids.map(getProduct).filter(Boolean).sort(function(a,b){ return (CATS[a.cat]||CATS.serum).order-(CATS[b.cat]||CATS.serum).order; });
+}
+/* ================= routine modes ================= */
+var MODES={
+  normal:{label:"Usual",desc:"Your routine as planned.",skip:[]},
+  barrier:{label:"Barrier repair",desc:"No actives. Cleanse, hydrate, seal.",skip:["retinoid","aha","bha","pha","vitc","bp","azelaic"]},
+  breakout:{label:"Breakout day",desc:"Keep the BP or salicylic, drop the rest.",skip:["retinoid","aha","pha","vitc","oil"]},
+  travel:{label:"Travel or dry climate",desc:"Extra hydration, gentler actives.",skip:["aha","bha","pha"]},
+  workout:{label:"Post-workout",desc:"Cleanse and SPF. That is the routine.",keep:["cleanser","spf","moisturiser"]},
+  five:{label:"Five minutes",desc:"Cleanser, one serum, moisturiser, SPF.",keep:["cleanser","moisturiser","spf","vitc","retinoid"]},
+  event:{label:"Pre-event",desc:"Nothing new within 7 days of the day.",skip:[]}
+};
+function applyMode(prods){
+  var m=MODES[S.mode]||MODES.normal;
+  return prods.filter(function(p){
+    if(m.keep) return m.keep.indexOf(p.cat)>-1;
+    if(m.skip.length&&p.tags.some(function(t){return m.skip.indexOf(t)>-1;})) return false;
+    if(m.skip.length&&m.skip.indexOf(p.cat)>-1) return false;
+    if(S.mode==="event"&&p.status==="cygnet") return false;
+    return true;
+  });
+}
+/* ================= environment (free, Open-Meteo) ================= */
+function fetchEnv(){
+  if(!S.loc) return Promise.resolve(null);
+  var la=S.loc.lat, lo=S.loc.lon;
+  var wx=fetch("https://api.open-meteo.com/v1/forecast?latitude="+la+"&longitude="+lo+"&daily=uv_index_max,relative_humidity_2m_mean,temperature_2m_max&forecast_days=1&timezone=auto").then(function(r){return r.json();}).catch(function(){return null;});
+  var aq=fetch("https://air-quality-api.open-meteo.com/v1/air-quality?latitude="+la+"&longitude="+lo+"&current=us_aqi,european_aqi").then(function(r){return r.json();}).catch(function(){return null;});
+  return Promise.all([wx,aq]).then(function(res){
+    var w=res[0],a=res[1]; var d=(w&&w.daily)||{}; var c=(a&&a.current)||{};
+    S.env={uv:d.uv_index_max?d.uv_index_max[0]:null,hum:d.relative_humidity_2m_mean?d.relative_humidity_2m_mean[0]:null,temp:d.temperature_2m_max?d.temperature_2m_max[0]:null,aqi:(c.us_aqi!==undefined)?c.us_aqi:null,at:todayISO()};
+    save(); return S.env;
+  });
+}
+function locate(cb){
+  if(!navigator.geolocation){ toast("Your browser will not share a location."); return; }
+  navigator.geolocation.getCurrentPosition(function(pos){
+    S.loc={lat:pos.coords.latitude,lon:pos.coords.longitude}; save();
+    fetchEnv().then(function(){ if(cb)cb(); });
+  },function(){ toast("No location shared, which is fair."); },{timeout:10000});
+}
+function envNotes(){
+  var e=S.env, n=[]; if(!e) return n;
+  if(e.uv!==null&&e.uv>=6) n.push({sev:"warn",t:"UV is high today ("+Math.round(e.uv)+")",d:"Reapply sunscreen every two hours if you are outside. Two finger-lengths, not a smear."});
+  else if(e.uv!==null&&e.uv>=3) n.push({sev:"info",t:"Moderate UV ("+Math.round(e.uv)+")",d:"Sunscreen in the morning is enough unless you are out all day."});
+  if(e.hum!==null&&e.hum<35) n.push({sev:"warn",t:"Dry air ("+Math.round(e.hum)+" percent humidity)",d:"Your skin will lose water faster. Consider the travel or dry-climate mode and a heavier moisturiser tonight."});
+  if(e.aqi!==null&&e.aqi>=100) n.push({sev:"warn",t:"Poor air quality (AQI "+e.aqi+")",d:"A proper cleanse tonight matters more than usual. Antioxidants in the morning help."});
+  return n;
+}
 
-  // the swans wander: every pass starts somewhere new
-  function sail(el,cfg){
-    var W=el.parentElement.clientWidth||380, H=el.parentElement.clientHeight||780;
-    var top=cfg.lo+Math.random()*(cfg.hi-cfg.lo);          // where on the water
-    var w=cfg.wmin+Math.random()*(cfg.wmax-cfg.wmin);      // how near or far
-    var dur=cfg.dmin+Math.random()*(cfg.dmax-cfg.dmin);    // how unhurried
-    var back=Math.random()<0.42;                           // sometimes right to left
-    var drift=(Math.random()*16-8);                        // gentle vertical wander
-    el.style.width=w+"px";
-    el.style.top=(top*H)+"px";
-    el.style.opacity=cfg.op;
-    el.style.transform="scaleX("+(back?-1:1)+") translateY(0)";
-    var from=back?(W+w+20):-(w+20);
-    var to=back?-(w+40):(W+w+40);
-    el.style.left="0px";
-    var anim=el.animate(
-      [{transform:"translateX("+from+"px) scaleX("+(back?-1:1)+") translateY(0px)"},
-       {transform:"translateX("+((from+to)/2)+"px) scaleX("+(back?-1:1)+") translateY("+drift+"px)",offset:0.5},
-       {transform:"translateX("+to+"px) scaleX("+(back?-1:1)+") translateY(0px)"}],
-      {duration:dur,easing:"linear",fill:"forwards"});
-    anim.onfinish=function(){
-      el.style.opacity=0;
-      setTimeout(function(){ sail(el,cfg); }, cfg.gapMin+Math.random()*(cfg.gapMax-cfg.gapMin));
-    };
+/* ================= views ================= */
+var view="today";
+function setView(v){ view=v; document.querySelectorAll(".tab").forEach(function(t){t.classList.toggle("on",t.dataset.v===v);}); render(); window.scrollTo({top:0,behavior:"smooth"}); }
+document.querySelectorAll(".tab").forEach(function(t){ t.onclick=function(){ setView(t.dataset.v); }; });
+
+function render(){
+  var c=el("content");
+  el("today-date").textContent=new Date().toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"long"});
+  if(!S.profile){ el("tabs").hidden=true; renderOnboarding(c); return; }
+  el("tabs").hidden=false;
+  var h=new Date().getHours();
+  var g=h<12?"Good morning":h<18?"Good afternoon":"Good evening";
+  el("greet").innerHTML=g+", <em>"+esc(S.profile.name||"you")+"</em>";
+  var mb=el("me-btn"); mb.hidden=false; mb.textContent=(S.profile.name||"?").charAt(0).toUpperCase(); mb.onclick=function(){ view="me"; document.querySelectorAll(".tab").forEach(function(t){t.classList.remove("on");}); render(); };
+  if(view==="today") renderToday(c);
+  else if(view==="shelf") renderShelf(c);
+  else if(view==="read") renderRead(c);
+  else if(view==="swans") renderSwans(c);
+  else if(view==="diary") renderDiary(c);
+  else renderMe(c);
+}
+
+/* ---------- onboarding ---------- */
+var ob={step:0,name:"",skin:"",sens:"",goals:[]};
+function renderOnboarding(c){
+  var dots='<div class="obdots">'+[0,1,2,3].map(function(i){return '<span class="'+(i<=ob.step?"on":"")+'"></span>';}).join("")+'</div>';
+  if(ob.step===0){
+    c.innerHTML='<div class="ob">'+dots+'<h2>Let us <em>begin</em> with you.</h2><p class="lead">A few questions so Linden reads your skin as yours, not as an average.</p>'+
+      '<div class="card" style="margin-top:20px;"><label class="fl">What should I call you?</label><input type="text" id="ob-name" placeholder="Your first name" value="'+esc(ob.name)+'" />'+
+      '<button class="cta" id="ob-next">Continue</button></div></div>';
+    el("ob-next").onclick=function(){ ob.name=el("ob-name").value.trim(); if(!ob.name){toast("A name, even a nickname.");return;} ob.step=1; render(); };
+  } else if(ob.step===1){
+    var skins=[["oily","Oily"],["combination","Combination"],["normal","Normal"],["dry","Dry"]];
+    c.innerHTML='<div class="ob">'+dots+'<h2>How would you <em>describe</em> your skin?</h2><p class="lead">By the afternoon, on a day you have done nothing to it.</p>'+
+      '<div class="card" style="margin-top:20px;"><div class="chips" id="ob-skin">'+skins.map(function(s){return '<button class="chip" data-k="'+s[0]+'" aria-pressed="'+(ob.skin===s[0])+'">'+s[1]+'</button>';}).join("")+'</div>'+
+      '<label class="fl">And how does it react?</label><div class="chips" id="ob-sens">'+[["resilient","Takes most things"],["sensitive","Sensitive"],["reactive","Reactive, flushes easily"]].map(function(s){return '<button class="chip" data-k="'+s[0]+'" aria-pressed="'+(ob.sens===s[0])+'">'+s[1]+'</button>';}).join("")+'</div>'+
+      '<button class="cta" id="ob-next">Continue</button></div></div>';
+    el("ob-skin").querySelectorAll(".chip").forEach(function(b){ b.onclick=function(){ ob.skin=b.dataset.k; render(); }; });
+    el("ob-sens").querySelectorAll(".chip").forEach(function(b){ b.onclick=function(){ ob.sens=b.dataset.k; render(); }; });
+    el("ob-next").onclick=function(){ if(!ob.skin||!ob.sens){toast("Pick one of each.");return;} ob.step=2; render(); };
+  } else if(ob.step===2){
+    var goals=[["redness","Calm redness"],["breakouts","Fewer breakouts"],["texture","Smoother texture"],["tone","Even tone"],["dryness","Less dryness"],["ageing","Fine lines"],["barrier","Repair my barrier"],["maintain","Keep what is working"]];
+    c.innerHTML='<div class="ob">'+dots+'<h2>What are you <em>hoping</em> for?</h2><p class="lead">Pick up to three. Everything else gets measured against these.</p>'+
+      '<div class="card" style="margin-top:20px;"><div class="chips" id="ob-goals">'+goals.map(function(g){return '<button class="chip" data-k="'+g[0]+'" aria-pressed="'+(ob.goals.indexOf(g[0])>-1)+'">'+g[1]+'</button>';}).join("")+'</div>'+
+      '<button class="cta" id="ob-next">Continue</button></div></div>';
+    el("ob-goals").querySelectorAll(".chip").forEach(function(b){ b.onclick=function(){ var k=b.dataset.k,i=ob.goals.indexOf(k); if(i>-1)ob.goals.splice(i,1); else if(ob.goals.length<3)ob.goals.push(k); else toast("Three is plenty."); render(); }; });
+    el("ob-next").onclick=function(){ if(!ob.goals.length){toast("At least one.");return;} ob.step=3; render(); };
+  } else {
+    c.innerHTML='<div class="ob">'+dots+'<h2>Now, your <em>shelf</em>.</h2><p class="lead">Add what you actually use. I will work out the order, the doses and what clashes. You can add more any time.</p>'+
+      '<div class="card" style="margin-top:20px;"><p style="margin:0;">Start with the things you use most days. A cleanser, a moisturiser, your sunscreen. Then any actives.</p>'+
+      '<button class="cta" id="ob-add">Add my first product</button><button class="ghost" id="ob-skip">I will do this later</button></div></div>';
+    el("ob-add").onclick=function(){ finishOnboarding(); openAddProduct(); };
+    el("ob-skip").onclick=function(){ finishOnboarding(); };
   }
-  var sA=document.getElementById("swanA"), sB=document.getElementById("swanB");
-  if(sA) sail(sA,{lo:0.12,hi:0.66,wmin:120,wmax:172,dmin:26000,dmax:40000,op:0.18,gapMin:1500,gapMax:7000});
-  if(sB) setTimeout(function(){ sail(sB,{lo:0.30,hi:0.82,wmin:74,wmax:112,dmin:34000,dmax:52000,op:0.11,gapMin:4000,gapMax:12000}); },5200);
+}
+function finishOnboarding(){ S.profile={name:ob.name,skin:ob.skin,sens:ob.sens,goals:ob.goals,created:todayISO()}; save(); setView("shelf"); }
 
-  document.getElementById("phone").addEventListener("click",function(e){
-    if(e.target.closest(".tabs")) return;
-    var r=this.getBoundingClientRect();
-    var d=document.createElement("div"); d.className="rip";
-    d.style.left=(e.clientX-r.left)+"px"; d.style.top=(e.clientY-r.top)+"px";
-    d.innerHTML='<i></i><i></i><i></i><i></i>'+
-      '<svg class="fea" viewBox="0 0 60 150"><path d="M30 4c14 22 16 62 6 92-4 12-9 22-14 30-1-9-2-19-2-30 0-42 4-72 10-92z" fill="#fff" fill-opacity="0.9"/>'+
-      '<path d="M30 8v112" stroke="#7C86E2" stroke-opacity="0.5" stroke-width="1.4"/>'+
-      '<g stroke="#7C86E2" stroke-opacity="0.35" stroke-width="1"><path d="M30 30l12 8M30 46l13 8M30 62l12 9M30 78l10 8M30 30L18 38M30 46l-13 8M30 62l-12 9M30 78l-10 8"/></g></svg>';
-    this.querySelector(".screen").appendChild(d);
-    setTimeout(function(){ d.remove(); },2400);
+/* ---------- today ---------- */
+function flagRow(sev,t,d){ var col=sev==="bad"?"var(--bad)":sev==="warn"?"var(--warn)":sev==="ok"?"var(--ok)":"var(--peri-2)"; return '<div class="flag"><div class="dot" style="background:'+col+'"></div><div class="fx"><div class="fn">'+t+'</div><div class="fd">'+d+'</div></div></div>'; }
+function todayFlags(){
+  var f=[]; var t=todayISO();
+  // conflicts within each routine
+  ["am","pm"].forEach(function(half){
+    findConflicts(S.routine[half]).forEach(function(cf){ f.push(flagRow(cf.sev,esc(cf.p1.name)+" and "+esc(cf.p2.name)+" clash ("+half.toUpperCase()+")",cf.why)); });
   });
+  // retinoid in AM
+  S.routine.am.map(getProduct).filter(Boolean).forEach(function(p){ if(p.tags.indexOf("retinoid")>-1) f.push(flagRow("bad",esc(p.name)+" is in your morning routine","Retinoids and daylight do not mix. Move it to the evening.")); });
+  // AM actives without SPF
+  var amHasSPF=S.routine.am.map(getProduct).filter(Boolean).some(function(p){return p.tags.indexOf("spf")>-1;});
+  var amHasActive=S.routine.am.map(getProduct).filter(Boolean).some(function(p){return p.tags.some(function(x){return ACTIVE_TAGS[x];});});
+  if(S.routine.am.length&&!amHasSPF) f.push(flagRow("bad","No sunscreen in your morning routine",amHasActive?"You are using actives, which makes this non-negotiable.":"The single most effective product you can own is missing."));
+  // load
+  var L=activeLoad(); if(L.over) f.push(flagRow("warn","Active load is "+L.nights+" exfoliating uses a week","Your skin's comfortable ceiling is about "+L.limit+". Across "+L.items.join(", ")+"."));
+  // expiry and levels
+  activeProducts().forEach(function(p){
+    var ex=expiryDate(p); if(ex){ var d=daysBetween(t,ex); if(d<0) f.push(flagRow("bad",esc(p.name)+" expired "+Math.abs(d)+" days ago","Opened "+fmt(p.opened)+". Vitamin C and retinoids in particular lose potency; sunscreen loses protection.")); else if(d<=21) f.push(flagRow("warn",esc(p.name)+" expires in "+d+" days","Use it up or let it go.")); }
+    var r=usageRate(p); if(r&&r.daysLeft<=14&&p.level>0) f.push(flagRow("warn",esc(p.name)+" runs out in about "+r.daysLeft+" days","At your logged rate. Yours, not the average."));
+    if(p.level!==undefined&&p.level<=10) f.push(flagRow("info",esc(p.name)+" is nearly empty","Decide now whether it earned a repurchase."));
+    var j=judgement(p); if(j&&p.status==="cygnet"&&!j.ready) f.push(flagRow("info","Too soon to judge "+esc(p.name),"A fair verdict is in "+j.left+" days. Change nothing else until then."));
+    if(j&&p.status==="cygnet"&&j.ready) f.push(flagRow("ok",esc(p.name)+" is ready for a verdict","It has had "+j.weeks+" weeks. Is it working? If yes, keep. If no, retire it before adding anything new."));
+  });
+  dormant().forEach(function(p){ f.push(flagRow("info","You have not used "+esc(p.name)+" in six weeks","Retire it, or was there a reason?")); });
+  envNotes().forEach(function(n){ f.push(flagRow(n.sev,n.t,n.d)); });
+  if(S.profile.event&&S.profile.event.date){ var dd=daysBetween(t,S.profile.event.date); if(dd>=0&&dd<=7) f.push(flagRow("warn",esc(S.profile.event.name||"Your event")+" is in "+dd+" day"+(dd===1?"":"s"),"Nothing new goes on your face until it is over.")); }
+  return f;
+}
+function renderToday(c){
+  var h=new Date().getHours(); var half=(h<15)?"am":"pm";
+  var ids=S.routine[half]; var prods=applyMode(orderRoutine(ids));
+  var logged=S.logs.filter(function(l){return l.date===todayISO();})[0];
+  var done=logged&&logged[half]&&logged[half].length;
+  var html='';
+  html+='<div class="label">'+(half==="am"?"This morning":"Tonight")+' <span class="pill">'+MODES[S.mode].label+'</span></div>';
+  if(!prods.length){ html+='<div class="card"><div class="t">Nothing planned for <em>'+(half==="am"?"mornings":"evenings")+'</em> yet</div><p>Go to your shelf, open a product, and choose when you use it.</p></div>'; }
+  else {
+    html+='<div class="card">'+prods.map(function(p,i){ var cat=CATS[p.cat]||CATS.serum; return '<div class="step"><div class="n">'+(i+1)+'</div><div class="sx"><div class="sn">'+esc(p.name)+(p.status==="cygnet"?'<span class="cygnet">Cygnet</span>':'')+'</div><div class="sd">'+cat.dose+'</div><div><span class="sw">'+esc(cat.where)+'</span></div></div></div>'; }).join("")+
+      '<button class="cta" id="log-done">'+(done?"Logged. Change it":"Done, log it")+'</button></div>';
+  }
+  var flags=todayFlags();
+  html+='<div class="label">Worth knowing'+(flags.length?' <span class="pill">'+flags.length+'</span>':'')+'</div>';
+  html+='<div class="card">'+(flags.length?flags.join(""):'<div class="empty">Nothing to flag. That is either very good or a very empty shelf.</div>')+'</div>';
+  html+='<div class="label">Today\'s mode</div><div class="card"><div class="modes">'+Object.keys(MODES).map(function(k){return '<button class="mode" data-m="'+k+'" aria-pressed="'+(S.mode===k)+'"><div class="mn">'+MODES[k].label+'</div><div class="md">'+MODES[k].desc+'</div></button>';}).join("")+'</div></div>';
+  html+='<div class="label">Where you are</div><div class="card">';
+  if(S.env){ html+='<div class="k">Today, from the forecast</div><div class="env"><div><div class="ev">'+(S.env.uv!==null?Math.round(S.env.uv):"–")+'</div><div class="el">UV index</div></div><div><div class="ev">'+(S.env.hum!==null?Math.round(S.env.hum)+"%":"–")+'</div><div class="el">Humidity</div></div><div><div class="ev">'+(S.env.aqi!==null?S.env.aqi:"–")+'</div><div class="el">Air quality</div></div></div><button class="ghost" id="env-refresh">Refresh</button>'; }
+  else { html+='<div class="t">Let me see the <em>weather</em></div><p>UV, humidity and air quality where you are, so the routine can adjust.</p><button class="cta" id="env-go">Use my location</button>'; }
+  html+='</div>';
+  c.innerHTML=html;
+  var lb=el("log-done"); if(lb) lb.onclick=function(){ var t=todayISO(); var l=S.logs.filter(function(x){return x.date===t;})[0]; if(!l){ l={date:t,am:[],pm:[]}; S.logs.push(l); } l[half]=prods.map(function(p){return p.id;}); l.mode=S.mode; save(); toast("Logged. Well done."); render(); };
+  document.querySelectorAll(".mode").forEach(function(b){ b.onclick=function(){ S.mode=b.dataset.m; save(); render(); }; });
+  var eg=el("env-go"); if(eg) eg.onclick=function(){ toast("Finding you..."); locate(render); };
+  var er=el("env-refresh"); if(er) er.onclick=function(){ fetchEnv().then(render); };
+}
+/* ---------- shelf ---------- */
+var LEVELS=[[100,"New"],[75,"3/4"],[50,"Half"],[25,"1/4"],[10,"Nearly gone"]];
+function levelLabel(l){ for(var i=0;i<LEVELS.length;i++){ if(l>=LEVELS[i][0]) return LEVELS[i][1]; } return "Nearly gone"; }
+function renderShelf(c){
+  var prods=activeProducts(), retired=S.products.filter(function(p){return p.status==="retired";});
+  var L=activeLoad();
+  var html='<div class="label">Your shelf <span class="pill">'+prods.length+' product'+(prods.length===1?"":"s")+'</span></div>';
+  html+='<div class="card"><div class="k">Before you buy anything</div><div class="t">What are you <em>solving?</em></div><p>Tell me the problem and I will check what you already own before recommending a single thing.</p><button class="cta" id="gate-open">Build from what I own</button><button class="ghost" id="add-open">Add a product</button></div>';
+  if(prods.length){
+    html+='<div class="card">'+prods.map(function(p){
+      var cat=CATS[p.cat]||CATS.serum; var ex=expiryDate(p); var r=usageRate(p); var j=judgement(p);
+      var meta=[cat.label]; if(p.tags.length) meta.push(p.tags.map(function(t){return TAGNAMES[t]||t;}).slice(0,3).join(", "));
+      var line2=[]; if(ex) line2.push("expires "+fmt(ex)); if(r) line2.push("~"+r.daysLeft+" days left at your pace"); if(j&&p.status==="cygnet") line2.push(j.ready?"ready to judge":"verdict in "+j.left+" days");
+      var when=[]; if(S.routine.am.indexOf(p.id)>-1)when.push("AM"); if(S.routine.pm.indexOf(p.id)>-1)when.push("PM");
+      return '<div class="prod"><div class="pn">'+esc(p.name)+(p.status==="cygnet"?'<span class="cygnet">Cygnet</span>':'')+(when.length?'<span class="cygnet" style="background:#EEF6EF;color:var(--ok);">'+when.join(" + ")+'</span>':'<span class="cygnet" style="background:#F6F1E4;color:var(--warn);">not in routine</span>')+'</div>'+
+        '<div class="pm">'+esc(meta.join(" \u00B7 "))+(line2.length?' \u00B7 '+esc(line2.join(" \u00B7 ")):'')+'</div>'+
+        '<div class="bar"><span style="width:'+(p.level||0)+'%"></span></div>'+
+        '<div class="pa"><button class="link" data-open="'+p.id+'">Open</button><span style="font-size:12px;color:var(--ink-soft);">'+levelLabel(p.level||0)+'</span></div></div>';
+    }).join("")+'</div>';
+  }
+  html+='<div class="label">Your active load</div><div class="card"><div class="t">'+L.nights+' exfoliating <em>uses a week</em></div><p>'+(L.over?"Over your comfortable ceiling of about "+L.limit+". Across "+esc(L.items.join(", "))+". Ease one back.":L.nights?"Within your ceiling of about "+L.limit+". Across "+esc(L.items.join(", "))+".":"No exfoliating actives in rotation. Gentle, or a gap, depending on your goals.")+'</p></div>';
+  if(retired.length) html+='<div class="label">Retired</div><div class="card">'+retired.map(function(p){return '<div class="prod"><div class="pn" style="color:var(--ink-soft);">'+esc(p.name)+'</div><div class="pa"><button class="link" data-restore="'+p.id+'">Bring back</button><button class="link danger" data-del="'+p.id+'">Delete</button></div></div>';}).join("")+'</div>';
+  c.innerHTML=html;
+  el("add-open").onclick=openAddProduct; el("gate-open").onclick=openGate;
+  c.querySelectorAll("[data-open]").forEach(function(b){ b.onclick=function(){ openProduct(b.dataset.open); }; });
+  c.querySelectorAll("[data-restore]").forEach(function(b){ b.onclick=function(){ var p=getProduct(b.dataset.restore); p.status="active"; save(); render(); }; });
+  c.querySelectorAll("[data-del]").forEach(function(b){ b.onclick=function(){ if(confirm("Delete for good?")){ S.products=S.products.filter(function(p){return p.id!==b.dataset.del;}); ["am","pm"].forEach(function(h){S.routine[h]=S.routine[h].filter(function(i){return i!==b.dataset.del;});}); save(); render(); } }; });
+}
+/* ---------- modal helpers ---------- */
+function openSheet(html){ el("sheet").innerHTML=html; el("modal").classList.add("on"); }
+function closeSheet(){ el("modal").classList.remove("on"); stopScan(); }
+el("modal").addEventListener("click",function(e){ if(e.target===el("modal")) closeSheet(); });
+
+/* ---------- add product ---------- */
+var bcStream=null;
+function stopScan(){ if(bcStream){ bcStream.getTracks().forEach(function(t){t.stop();}); bcStream=null; } }
+function openAddProduct(prefill){
+  prefill=prefill||{};
+  var cats=Object.keys(CATS).map(function(k){return '<option value="'+k+'"'+(prefill.cat===k?" selected":"")+'>'+CATS[k].label+'</option>';}).join("");
+  openSheet('<h3>Add to <em>your shelf</em></h3>'+
+    '<div id="scan-area"><button class="ghost" id="scan-btn" style="margin-top:12px;">Scan the barcode</button><div id="scan-host"></div></div>'+
+    '<label class="fl">Product name</label><input type="text" id="ap-name" placeholder="e.g. Azelaic Acid 10%" value="'+esc(prefill.name||"")+'" />'+
+    '<label class="fl">Brand</label><input type="text" id="ap-brand" placeholder="e.g. The Ordinary" value="'+esc(prefill.brand||"")+'" />'+
+    '<label class="fl">What kind of product</label><select id="ap-cat">'+cats+'</select>'+
+    '<label class="fl">Ingredients (paste the list, optional but powerful)</label><textarea id="ap-ings" placeholder="Aqua, Niacinamide, Glycerin...">'+esc(prefill.ings||"")+'</textarea>'+
+    '<div class="row2"><div><label class="fl">Opened on</label><input type="date" id="ap-opened" value="'+todayISO()+'" /></div><div><label class="fl">Months until expiry (PAO)</label><input type="number" id="ap-pao" placeholder="auto" min="1" max="36" /></div></div>'+
+    '<label class="fl">How full is it?</label><div class="level" id="ap-level">'+LEVELS.map(function(l){return '<button type="button" data-l="'+l[0]+'" aria-pressed="'+(l[0]===100)+'">'+l[1]+'</button>';}).join("")+'</div>'+
+    '<label class="fl">When do you use it?</label><div class="chips" style="margin-top:2px;"><button class="chip" id="ap-am" aria-pressed="false" type="button">Mornings</button><button class="chip" id="ap-pm" aria-pressed="false" type="button">Evenings</button></div>'+
+    '<label class="fl">Is this new to you?</label><div class="chips" style="margin-top:2px;"><button class="chip" id="ap-new" aria-pressed="false" type="button">Yes, just starting it</button></div>'+
+    '<button class="cta" id="ap-save">Add it</button><button class="ghost" id="ap-cancel">Cancel</button>');
+  var lvl=100;
+  el("ap-level").querySelectorAll("button").forEach(function(b){ b.onclick=function(){ lvl=+b.dataset.l; el("ap-level").querySelectorAll("button").forEach(function(x){x.setAttribute("aria-pressed",x===b);}); }; });
+  ["ap-am","ap-pm","ap-new"].forEach(function(id){ el(id).onclick=function(){ el(id).setAttribute("aria-pressed",el(id).getAttribute("aria-pressed")!=="true"); }; });
+  el("ap-cat").onchange=function(){ var cat=CATS[el("ap-cat").value]; el("ap-am").setAttribute("aria-pressed",!!cat.am); el("ap-pm").setAttribute("aria-pressed",!!cat.pm); };
+  el("ap-cat").onchange();
+  el("ap-cancel").onclick=closeSheet;
+  el("scan-btn").onclick=startScan;
+  el("ap-save").onclick=function(){
+    var name=el("ap-name").value.trim(); if(!name){ toast("It needs a name."); return; }
+    var cat=el("ap-cat").value, ings=el("ap-ings").value.trim();
+    var p={id:uid(),name:name,brand:el("ap-brand").value.trim(),cat:cat,ings:ings,tags:detectTags(ings,cat),opened:el("ap-opened").value||todayISO(),pao:parseInt(el("ap-pao").value,10)||null,level:lvl,levelLog:[{date:todayISO(),level:lvl}],added:todayISO(),status:(el("ap-new").getAttribute("aria-pressed")==="true")?"cygnet":"active",started:todayISO()};
+    S.products.push(p);
+    if(el("ap-am").getAttribute("aria-pressed")==="true") S.routine.am.push(p.id);
+    if(el("ap-pm").getAttribute("aria-pressed")==="true") S.routine.pm.push(p.id);
+    save(); closeSheet(); toast(p.tags.length?"Added. I read "+p.tags.length+" ingredient"+(p.tags.length===1?"":"s")+" of note.":"Added."); render();
+  };
+}
+function startScan(){
+  var host=el("scan-host");
+  if(!("BarcodeDetector" in window)){ host.innerHTML='<p style="font-size:13px;color:var(--ink-soft);margin-top:8px;">This browser cannot read barcodes (Safari on iPhone does not yet). Type the barcode number instead:</p><div class="row2" style="margin-top:6px;"><div><input type="text" id="bc-manual" placeholder="e.g. 769915190847" inputmode="numeric" /></div><div style="flex:0 0 90px;"><button class="cta" id="bc-look" style="margin-top:0;padding:12px;">Look up</button></div></div>'; el("bc-look").onclick=function(){ lookupBarcode(el("bc-manual").value.trim()); }; return; }
+  host.innerHTML='<video id="bcvid" autoplay playsinline muted></video><p style="font-size:12px;color:var(--ink-soft);margin-top:6px;">Hold the barcode steady in view.</p>';
+  navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}}).then(function(stream){
+    bcStream=stream; var v=el("bcvid"); v.srcObject=stream;
+    var det=new BarcodeDetector({formats:["ean_13","ean_8","upc_a","upc_e"]});
+    var tick=function(){ if(!bcStream) return; det.detect(v).then(function(codes){ if(codes.length){ stopScan(); lookupBarcode(codes[0].rawValue); } else setTimeout(tick,350); }).catch(function(){ setTimeout(tick,500); }); };
+    v.onloadedmetadata=tick;
+  }).catch(function(){ host.innerHTML='<p style="font-size:13px;color:var(--ink-soft);margin-top:8px;">No camera access. Type the name instead.</p>'; });
+}
+function lookupBarcode(code){
+  if(!code){ toast("No barcode."); return; }
+  toast("Looking that up...");
+  fetch("https://world.openbeautyfacts.org/api/v0/product/"+encodeURIComponent(code)+".json").then(function(r){return r.json();}).then(function(d){
+    if(d.status!==1||!d.product){ toast("Not in the open database. Type it in, it only takes a moment."); return; }
+    var p=d.product; var name=p.product_name||p.product_name_en||""; var brand=p.brands||""; var ings=p.ingredients_text||p.ingredients_text_en||"";
+    var nm=el("ap-name"), br=el("ap-brand"), ig=el("ap-ings");
+    if(nm&&name) nm.value=name; if(br&&brand) br.value=brand.split(",")[0]; if(ig&&ings) ig.value=ings;
+    var host=el("scan-host"); if(host) host.innerHTML='<p style="font-size:13px;color:var(--ok);margin-top:8px;">Found it'+(ings?", ingredients included":", but no ingredient list on file")+'. Check the category below.</p>';
+  }).catch(function(){ toast("The database did not answer. Type it in instead."); });
+}
+/* ---------- product detail ---------- */
+function openProduct(id){
+  var p=getProduct(id); if(!p) return; var cat=CATS[p.cat]||CATS.serum; var ex=expiryDate(p); var r=usageRate(p); var j=judgement(p);
+  var inAM=S.routine.am.indexOf(id)>-1, inPM=S.routine.pm.indexOf(id)>-1;
+  openSheet('<h3>'+esc(p.name)+'</h3><p style="color:var(--ink-soft);font-size:13px;margin-top:4px;">'+esc([p.brand,cat.label].filter(Boolean).join(" \u00B7 "))+'</p>'+
+    '<label class="fl">How full is it now?</label><div class="level" id="pd-level">'+LEVELS.map(function(l){return '<button type="button" data-l="'+l[0]+'" aria-pressed="'+(levelLabel(p.level||0)===l[1])+'">'+l[1]+'</button>';}).join("")+'</div>'+
+    (r?'<p style="font-size:13px;color:var(--ink-soft);margin-top:8px;">At your pace, about '+r.daysLeft+' days left. Yours, not the average.</p>':'<p style="font-size:13px;color:var(--ink-soft);margin-top:8px;">Update the level now and then and I will learn your pace.</p>')+
+    '<label class="fl">In your routine</label><div class="chips" style="margin-top:2px;"><button class="chip" id="pd-am" aria-pressed="'+inAM+'" type="button">Mornings</button><button class="chip" id="pd-pm" aria-pressed="'+inPM+'" type="button">Evenings</button></div>'+
+    (p.tags.some(function(t){return EXFOL_TAGS[t];})?'<label class="fl">Uses per week</label><input type="number" id="pd-freq" min="1" max="14" value="'+(p.freq||((inAM?7:0)+(inPM?7:0))||3)+'" />':'')+
+    '<div class="card" style="box-shadow:none;background:var(--mist);margin-top:14px;"><div class="k">How to use it</div><p style="margin-top:6px;"><b>Dose.</b> '+cat.dose+'</p><p><b>Where.</b> '+cat.where+'</p>'+(ex?'<p><b>Expires.</b> '+fmt(ex)+' (opened '+fmt(p.opened)+').</p>':'')+(j?'<p><b>Judgement.</b> '+(j.ready?"It has had its "+j.weeks+" weeks. Time for an honest verdict.":"A fair verdict on this takes about "+j.weeks+" weeks. That is "+fmt(j.verdict)+".")+'</p>':'')+(p.tags.length?'<p><b>I read.</b> '+esc(p.tags.map(function(t){return TAGNAMES[t]||t;}).join(", "))+'.</p>':'')+'</div>'+
+    '<button class="cta" id="pd-save">Save</button>'+
+    '<div class="chips" style="margin-top:12px;justify-content:space-between;"><button class="link" id="pd-cygnet">'+(p.status==="cygnet"?"It has earned its place":"Mark as new to me")+'</button><button class="link danger" id="pd-retire">Retire it</button></div>');
+  var lvl=p.level;
+  el("pd-level").querySelectorAll("button").forEach(function(b){ b.onclick=function(){ lvl=+b.dataset.l; el("pd-level").querySelectorAll("button").forEach(function(x){x.setAttribute("aria-pressed",x===b);}); }; });
+  ["pd-am","pd-pm"].forEach(function(k){ el(k).onclick=function(){ el(k).setAttribute("aria-pressed",el(k).getAttribute("aria-pressed")!=="true"); }; });
+  el("pd-save").onclick=function(){
+    if(lvl!==p.level){ p.level=lvl; p.levelLog=(p.levelLog||[]); p.levelLog.push({date:todayISO(),level:lvl}); }
+    var am=el("pd-am").getAttribute("aria-pressed")==="true", pm=el("pd-pm").getAttribute("aria-pressed")==="true";
+    S.routine.am=S.routine.am.filter(function(i){return i!==id;}); S.routine.pm=S.routine.pm.filter(function(i){return i!==id;});
+    if(am) S.routine.am.push(id); if(pm) S.routine.pm.push(id);
+    var fq=el("pd-freq"); if(fq) p.freq=parseInt(fq.value,10)||null;
+    save(); closeSheet(); render();
+  };
+  el("pd-cygnet").onclick=function(){ p.status=p.status==="cygnet"?"active":"cygnet"; if(p.status==="cygnet")p.started=todayISO(); save(); closeSheet(); render(); };
+  el("pd-retire").onclick=function(){ p.status="retired"; S.routine.am=S.routine.am.filter(function(i){return i!==id;}); S.routine.pm=S.routine.pm.filter(function(i){return i!==id;}); save(); closeSheet(); toast("Retired. It can come back."); render(); };
+}
+/* ---------- the gatekeeper ---------- */
+var GOALMAP={
+  redness:{tags:["azelaic","niacinamide","ceramide"],cats:["azelaic","niacinamide","moisturiser"],lowrisk:"Cut your active load to two nights a week for 14 days and add nothing. Redness that eases in that window was over-exfoliation, not a missing product."},
+  breakouts:{tags:["bha","bp","retinoid","azelaic","niacinamide"],cats:["bp","exfoliant","retinoid","azelaic"],lowrisk:"Before buying, drop any face oil or heavy occlusive for 14 days and change your pillowcase twice a week. Clogged pores often come from what you already use."},
+  texture:{tags:["aha","retinoid","pha"],cats:["exfoliant","retinoid"],lowrisk:"Use the exfoliant you already own twice a week for six weeks before judging. Texture is slow, and doubling up makes it worse."},
+  tone:{tags:["vitc","azelaic","niacinamide","tranexamic","retinoid"],cats:["vitc","azelaic","niacinamide"],lowrisk:"Sunscreen every single morning for eight weeks does more for tone than any serum. Confirm that first."},
+  dryness:{tags:["ha","ceramide","oil"],cats:["moisturiser","oil","toner"],lowrisk:"Apply your moisturiser to slightly damp skin and add a few drops of oil on top for a week. Often it is application, not product."},
+  ageing:{tags:["retinoid","vitc","peptide"],cats:["retinoid","vitc","spf"],lowrisk:"Retinoid at night, sunscreen every morning. If you already own both, you own the two things that matter. Give them twelve weeks."},
+  barrier:{tags:["ceramide","ha","niacinamide"],cats:["moisturiser","cleanser"],lowrisk:"Stop all actives for two weeks. Cleanse gently, moisturise, sunscreen. Buying a barrier serum while still exfoliating is bailing water with the tap on."},
+  maintain:{tags:[],cats:[],lowrisk:"If it is working, change nothing. The urge to add is not a signal."}
+};
+function openGate(){
+  var goals=[["redness","Calm redness"],["breakouts","Fewer breakouts"],["texture","Smoother texture"],["tone","Even tone"],["dryness","Less dryness"],["ageing","Fine lines"],["barrier","Repair my barrier"]];
+  openSheet('<h3>What are you <em>solving?</em></h3><p style="color:var(--ink-soft);font-size:14px;margin-top:6px;">Pick the problem. I will check your shelf, your plan and your calendar before suggesting anything you would have to buy.</p>'+
+    '<div class="chips" style="margin-top:14px;" id="gate-goals">'+goals.map(function(g){return '<button class="chip" data-k="'+g[0]+'" type="button">'+g[1]+'</button>';}).join("")+'</div><div id="gate-out" style="margin-top:14px;"></div>');
+  el("gate-goals").querySelectorAll(".chip").forEach(function(b){ b.onclick=function(){ el("gate-goals").querySelectorAll(".chip").forEach(function(x){x.setAttribute("aria-pressed",x===b);}); gateAnswer(b.dataset.k); }; });
+}
+function gateAnswer(goal){
+  var g=GOALMAP[goal]; var own=activeProducts().filter(function(p){ return p.tags.some(function(t){return g.tags.indexOf(t)>-1;})||g.cats.indexOf(p.cat)>-1; });
+  var cyg=activeProducts().filter(function(p){return p.status==="cygnet";});
+  var ev=S.profile.event&&S.profile.event.date?daysBetween(todayISO(),S.profile.event.date):null;
+  var L=activeLoad();
+  var html='';
+  if(own.length) html+='<div class="card" style="box-shadow:none;background:var(--mist);"><div class="k">You already own</div>'+own.map(function(p){var j=judgement(p);return '<div class="flag"><div class="dot" style="background:var(--ok)"></div><div class="fx"><div class="fn">'+esc(p.name)+'</div><div class="fd">'+(S.routine.am.indexOf(p.id)>-1||S.routine.pm.indexOf(p.id)>-1?"Already in your routine":"On your shelf but not in your routine. Start there.")+(j&&p.status==="cygnet"&&!j.ready?" Verdict in "+j.left+" days, so it has not had a fair chance yet.":"")+'</div></div></div>';}).join("")+'</div>';
+  else html+='<div class="card" style="box-shadow:none;background:var(--mist);"><div class="k">Your shelf</div><p style="margin-top:6px;">Nothing you own is aimed at this. That is useful to know, and still not a reason to buy today.</p></div>';
+  var blocks=[];
+  if(cyg.length) blocks.push("You are already testing "+cyg.map(function(p){return p.name;}).join(" and ")+". Adding another new thing means you will never know which one did what.");
+  if(L.over) blocks.push("Your active load is already over your ceiling. Anything new that exfoliates would make it worse.");
+  if(ev!==null&&ev>=0&&ev<21) blocks.push((S.profile.event.name||"Your event")+" is in "+ev+" days. That is not enough time to test something new safely.");
+  if(blocks.length) html+='<div class="card" style="box-shadow:none;background:#F9F0EE;"><div class="k" style="color:var(--bad);">Reasons to wait</div>'+blocks.map(function(b){return '<p style="margin-top:6px;">'+esc(b)+'</p>';}).join("")+'</div>';
+  html+='<div class="card" style="box-shadow:none;background:var(--mist);"><div class="k">The lowest-risk test first</div><p style="margin-top:6px;">'+g.lowrisk+'</p></div>';
+  html+='<p style="font-size:12px;color:var(--ink-soft);margin-top:8px;">If, after that, you still want something new: buy one thing, mark it as new to me, and change nothing else until its verdict date.</p>';
+  el("gate-out").innerHTML=html;
+}
+/* ---------- read, swans, me ---------- */
+function renderRead(c){
+  c.innerHTML='<div class="label">Read</div><div class="card"><div class="k">Next phase</div><div class="t">The camera is <em>next</em></div><p>Photo readings zone by zone, the ghost overlay so every photo lines up, and the integrity check that tells you when a change is lighting rather than skin. It is being built now. Everything you log meanwhile becomes the history it reads from.</p></div>';
+}
+function renderSwans(c){
+  c.innerHTML='<div class="label">The Swans</div><div class="card"><div class="k">Next phase</div><div class="t">Your photos will <em>gather here</em></div><p>Same light, same angle, side by side across weeks, with what changed in your routine between them. Arriving with the camera.</p></div>';
+}
+function renderMe(c){
+  var pf=S.profile; var streak=S.logs.length;
+  var html='<div class="label">You</div><div class="card"><div class="t">'+esc(pf.name)+', <em>'+esc(pf.skin)+'</em> and '+esc(pf.sens==="resilient"?"resilient":pf.sens)+'</div><p>Working on: '+esc(pf.goals.map(function(g){return g;}).join(", "))+'.</p><p>'+streak+' day'+(streak===1?"":"s")+' logged so far.</p></div>';
+  html+='<div class="label">Anything coming up?</div><div class="card"><div class="k">Pre-event lockdown</div><p style="margin-top:6px;">Tell me the date and nothing new goes near your face in the week before it.</p><div class="row2" style="margin-top:8px;"><div><input type="text" id="ev-name" placeholder="The wedding" value="'+esc((pf.event||{}).name||"")+'" /></div><div><input type="date" id="ev-date" value="'+esc((pf.event||{}).date||"")+'" /></div></div><button class="cta" id="ev-save">Save</button></div>';
+  html+='<div class="label">Notes for your clinician</div><div class="card"><div class="k">Export</div><p style="margin-top:6px;">A plain summary of your shelf, routine, changes and what you have logged, to take to an appointment.</p><button class="ghost" id="exp-btn">Copy the summary</button></div>';
+  html+='<div class="label">Your data</div><div class="card"><p>Everything lives in this browser, on this device. Nothing is sent anywhere. Clearing your browser data clears Linden too.</p><button class="ghost" id="reset-btn" style="color:var(--bad);border-color:rgba(196,99,95,.35);">Start over completely</button></div>';
+  html+='<p style="text-align:center;font-size:11px;color:rgba(255,255,255,.6);margin-top:18px;">Linden reads and measures. It does not diagnose. See a clinician for anything that worries you.<br>Copyright 2026 Sonum Samra. All rights reserved.</p>';
+  c.innerHTML=html;
+  el("ev-save").onclick=function(){ pf.event={name:el("ev-name").value.trim(),date:el("ev-date").value}; save(); toast(pf.event.date?"Noted. I will guard the week before.":"Cleared."); render(); };
+  el("exp-btn").onclick=function(){ var txt=exportSummary(); if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(function(){toast("Copied. Paste it anywhere.");}); } else prompt("Copy this:",txt); };
+  el("reset-btn").onclick=function(){ if(confirm("This deletes everything. Sure?")){ localStorage.removeItem("linden"); location.reload(); } };
+}
+function exportSummary(){
+  var pf=S.profile, lines=[];
+  lines.push("LINDEN SUMMARY, "+fmt(todayISO()));
+  lines.push("Skin: "+pf.skin+", "+pf.sens+". Goals: "+pf.goals.join(", ")+".");
+  lines.push("");
+  lines.push("MORNING ROUTINE"); orderRoutine(S.routine.am).forEach(function(p,i){ lines.push((i+1)+". "+p.name+(p.brand?" ("+p.brand+")":"")+" - "+(CATS[p.cat]||CATS.serum).label+(p.tags.length?" ["+p.tags.map(function(t){return TAGNAMES[t]||t;}).join(", ")+"]":"")); });
+  lines.push(""); lines.push("EVENING ROUTINE"); orderRoutine(S.routine.pm).forEach(function(p,i){ lines.push((i+1)+". "+p.name+(p.brand?" ("+p.brand+")":"")+" - "+(CATS[p.cat]||CATS.serum).label+(p.tags.length?" ["+p.tags.map(function(t){return TAGNAMES[t]||t;}).join(", ")+"]":"")); });
+  lines.push(""); lines.push("NEW OR RECENTLY STARTED"); activeProducts().filter(function(p){return p.status==="cygnet";}).forEach(function(p){ lines.push("- "+p.name+", started "+fmt(p.started||p.added)); });
+  lines.push(""); lines.push("RETIRED"); S.products.filter(function(p){return p.status==="retired";}).forEach(function(p){ lines.push("- "+p.name); });
+  var L=activeLoad(); lines.push(""); lines.push("ACTIVE LOAD: "+L.nights+" exfoliating uses per week (ceiling ~"+L.limit+")");
+  var cf=findConflicts(S.routine.am).concat(findConflicts(S.routine.pm)); if(cf.length){ lines.push(""); lines.push("FLAGGED COMBINATIONS"); cf.forEach(function(c){ lines.push("- "+c.p1.name+" + "+c.p2.name+": "+c.why); }); }
+  lines.push(""); lines.push("Days logged: "+S.logs.length+". Generated by Linden. Measured, not diagnosed.");
+  return lines.join("\n");
+}
+
+/* ================= PHASE 2: the camera ================= */
+S.photos=S.photos||[];
+var PW=360, PH=480;
+function ovalGuide(){ return '<svg class="guide" viewBox="0 0 360 480"><defs><mask id="m"><rect width="360" height="480" fill="#fff"/><ellipse cx="180" cy="240" rx="115" ry="192" fill="#000"/></mask></defs><rect width="360" height="480" fill="rgba(14,16,48,.55)" mask="url(#m)"/><ellipse cx="180" cy="240" rx="115" ry="192" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="1.5" stroke-dasharray="6 5"/><line x1="180" y1="60" x2="180" y2="420" stroke="rgba(255,255,255,.18)"/><line x1="70" y1="240" x2="290" y2="240" stroke="rgba(255,255,255,.18)"/></svg>'; }
+/* zones, in guide coordinates */
+var ZONES={
+  forehead:{label:"Forehead",test:function(x,y){return y>60&&y<150&&Math.abs(x-180)<80;}},
+  undereye:{label:"Under-eye",test:function(x,y){return y>195&&y<240&&Math.abs(x-180)>22&&Math.abs(x-180)<85;}},
+  tzone:{label:"T-zone",test:function(x,y){return Math.abs(x-180)<22&&y>150&&y<330;}},
+  cheeks:{label:"Cheeks",test:function(x,y){return y>240&&y<330&&Math.abs(x-180)>32&&Math.abs(x-180)<105;}},
+  chin:{label:"Chin",test:function(x,y){return y>345&&y<420&&Math.abs(x-180)<60;}}
+};
+function inOval(x,y){ var dx=(x-180)/115, dy=(y-240)/192; return dx*dx+dy*dy<=1; }
+function analyzeCanvas(cv){
+  var ctx=cv.getContext("2d"), img=ctx.getImageData(0,0,PW,PH).data;
+  var z={}; Object.keys(ZONES).forEach(function(k){ z[k]={n:0,red:0,lum:0,shine:0,r:0,b:0,cells:{}}; });
+  var tot={n:0,lum:0,r:0,b:0,skin:0,all:0};
+  for(var y=0;y<PH;y+=2)for(var x=0;x<PW;x+=2){
+    if(!inOval(x,y)) continue; tot.all++;
+    var i=(y*PW+x)*4, r=img[i],g=img[i+1],b=img[i+2];
+    var lum=0.299*r+0.587*g+0.114*b;
+    var isSkin=lum>45&&lum<250&&r>g&&r>b*0.9&&(r-b)>10;   // rough skin gate
+    if(!isSkin) continue;
+    tot.skin++; tot.n++; tot.lum+=lum; tot.r+=r; tot.b+=b;
+    var red=r-(g+b)/2, mx=Math.max(r,g,b), mn=Math.min(r,g,b);
+    var sh=(lum>205&&(mx-mn)<48)?1:0;
+    Object.keys(ZONES).forEach(function(k){
+      if(!ZONES[k].test(x,y)) return; var zz=z[k];
+      zz.n++; zz.red+=red; zz.lum+=lum; zz.shine+=sh; zz.r+=r; zz.b+=b;
+      var cx=Math.floor(x/12), cy=Math.floor(y/12), key=cx+","+cy; var c=zz.cells[key]||(zz.cells[key]={n:0,red:0,lum:0}); c.n++; c.red+=red; c.lum+=lum;
+    });
+  }
+  var out={zones:{},lum:tot.n?tot.lum/tot.n:0,temp:tot.n&&tot.b?(tot.r/tot.n)/(tot.b/tot.n):1,skinFrac:tot.all?tot.skin/tot.all:0};
+  // the person's own baseline: median zone redness. Redness is scored relative to this,
+  // so a fair face and a deep face are each read against themselves, not against a fixed number.
+  var zoneMeans=Object.keys(z).filter(function(k){return z[k].n;}).map(function(k){return z[k].red/z[k].n;}).sort(function(a,b){return a-b;});
+  var base=zoneMeans.length?zoneMeans[Math.floor(zoneMeans.length/2)]:0;
+  out.baseRed=base;
+  Object.keys(z).forEach(function(k){
+    var zz=z[k]; if(!zz.n){ out.zones[k]={redness:0,shine:0,texture:0,spots:0,n:0}; return; }
+    var mred=zz.red/zz.n, mlum=zz.lum/zz.n;
+    // texture: how much the little cells disagree with each other
+    var cells=Object.keys(zz.cells).map(function(kk){return zz.cells[kk];}).filter(function(c){return c.n>=6;});
+    var lums=cells.map(function(c){return c.lum/c.n;}); var mean=lums.reduce(function(a,b){return a+b;},0)/(lums.length||1);
+    var sd=Math.sqrt(lums.reduce(function(a,b){return a+(b-mean)*(b-mean);},0)/(lums.length||1));
+    // spots: cells notably redder and darker than the zone
+    // a spot is a small patch clearly redder than its zone, and usually a touch darker
+    var spots=cells.filter(function(c){ return (c.red/c.n)>mred+12&&(c.lum/c.n)<mlum+2; }).length;
+    // 0 = at your baseline; 100 = strongly flushed relative to you
+    out.zones[k]={redness:Math.max(0,Math.min(100,Math.round((mred-base+6)/34*100))),shine:Math.round(zz.shine/zz.n*100),texture:Math.max(0,Math.min(100,Math.round(sd/22*100))),spots:Math.max(0,Math.round(spots/3)),n:zz.n};
+  });
+  return out;
+}
+function word(metric,v){
+  if(metric==="redness") return v<28?"Calm":v<55?"Some":"Red";
+  if(metric==="shine") return v<8?"Matte":v<20?"Some":"Shiny";
+  if(metric==="texture") return v<30?"Smooth":v<55?"Some":"Rough";
+  return v+" spot"+(v===1?"":"s");
+}
+function integrity(a,b){
+  if(!a||!b) return {ok:true,reasons:[],note:"First photo. Everything after this compares to it."};
+  var reasons=[];
+  if(Math.abs(a.lum-b.lum)>24) reasons.push(a.lum>b.lum?"this photo is noticeably brighter":"this photo is noticeably darker");
+  if(Math.abs(a.temp-b.temp)>0.14) reasons.push(a.temp>b.temp?"the light is warmer than last time":"the light is cooler than last time");
+  if(Math.abs(a.skinFrac-b.skinFrac)>0.16) reasons.push("your face fills the frame differently, so the distance changed");
+  var ha=a.hour, hb=b.hour; if(ha!==undefined&&hb!==undefined&&Math.abs(ha-hb)>3) reasons.push("it was taken at a different time of day");
+  return {ok:!reasons.length,reasons:reasons,note:reasons.length?"Not quite comparable: "+reasons.join(", ")+". Any apparent change may be the light, not your skin.":"Comparable to your last one. Same light, same distance, same time of day. What changed is real."};
+}
+/* ---------- read tab ---------- */
+var camStream=null, lastCapture=null;
+function stopCam(){ if(camStream){ camStream.getTracks().forEach(function(t){t.stop();}); camStream=null; } }
+function renderRead(c){
+  stopCam();
+  var prev=S.photos[S.photos.length-1];
+  var html='<div class="label">Read <span class="pill">'+S.photos.length+' so far</span></div>';
+  html+='<div class="card"><div class="k">'+(prev?"Line up with your last one":"Your first reading")+'</div><div class="t">Same light, same <em>window</em></div><p>'+(prev?"The faint ghost is your last photo. Match it and the comparison will be honest.":"Face a window in daylight, no flash, no makeup. Fill the oval. This becomes the baseline.")+'</p>'+
+    '<div class="cam" id="cam" style="margin-top:14px;"><video id="camv" autoplay playsinline muted></video>'+(prev?'<img class="ghost" src="'+prev.data+'" alt="" />':'')+ovalGuide()+'</div>'+
+    '<button class="cta" id="cam-shoot">Take the photo</button><button class="ghost" id="cam-upload">Upload one instead</button><input type="file" id="cam-file" accept="image/*" capture="user" hidden /></div>';
+  html+='<div id="read-out"></div>';
+  c.innerHTML=html;
+  navigator.mediaDevices&&navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:720},height:{ideal:960}}}).then(function(s){ camStream=s; el("camv").srcObject=s; }).catch(function(){ var cm=el("cam"); if(cm) cm.insertAdjacentHTML("afterbegin",'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;padding:20px;text-align:center;">No camera access. Upload a photo instead.</div>'); });
+  el("cam-shoot").onclick=function(){ var v=el("camv"); if(!camStream||!v.videoWidth){ toast("No camera. Upload instead."); return; } var cv=document.createElement("canvas"); cv.width=PW; cv.height=PH; var ctx=cv.getContext("2d"); var vw=v.videoWidth,vh=v.videoHeight, sc=Math.max(PW/vw,PH/vh), sw=PW/sc, sh=PH/sc; ctx.translate(PW,0); ctx.scale(-1,1); ctx.drawImage(v,(vw-sw)/2,(vh-sh)/2,sw,sh,0,0,PW,PH); captureDone(cv); };
+  el("cam-upload").onclick=function(){ el("cam-file").click(); };
+  el("cam-file").onchange=function(){ var f=this.files[0]; if(!f) return; var im=new Image(); im.onload=function(){ var cv=document.createElement("canvas"); cv.width=PW; cv.height=PH; var ctx=cv.getContext("2d"); var sc=Math.max(PW/im.width,PH/im.height), sw=PW/sc, sh=PH/sc; ctx.drawImage(im,(im.width-sw)/2,(im.height-sh)/2,sw,sh,0,0,PW,PH); captureDone(cv); }; im.src=URL.createObjectURL(f); };
+}
+function captureDone(cv){
+  stopCam();
+  var m=analyzeCanvas(cv);
+  if(m.skinFrac<0.25){ toast("I cannot find a face in the oval. Try again in better light."); renderRead(el("content")); return; }
+  var prev=S.photos[S.photos.length-1];
+  var rec={id:uid(),date:todayISO(),hour:new Date().getHours(),data:cv.toDataURL("image/jpeg",0.62),zones:m.zones,lum:m.lum,temp:m.temp,skinFrac:m.skinFrac};
+  rec.integrity=integrity(rec,prev);
+  S.photos.push(rec); while(S.photos.length>30) S.photos.shift(); save();
+  var cm=el("cam"); if(cm) cm.innerHTML='<img src="'+rec.data+'" alt="" />'+ovalGuide();
+  el("cam-shoot").hidden=true; el("cam-upload").textContent="Take another";
+  el("read-out").innerHTML=readingCard(rec,prev);
+  el("read-out").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function readingCard(rec,prev){
+  var zs=Object.keys(ZONES).map(function(k){
+    var z=rec.zones[k], pz=prev?prev.zones[k]:null; var line=word("redness",z.redness)+(z.spots?", "+word("spots",z.spots):"");
+    var d=""; if(pz&&rec.integrity.ok){ var dr=z.redness-pz.redness; d=Math.abs(dr)<6?"steady":(dr<0?"calmer by "+Math.abs(dr):"redder by "+dr); }
+    return '<div class="zone"><div class="zn">'+ZONES[k].label+'</div><div class="zv">'+line+'</div><div class="zd">'+word("shine",z.shine)+' \u00B7 '+word("texture",z.texture)+(d?' \u00B7 '+d:'')+'</div></div>';
+  }).join("");
+  var overall=Math.round(Object.keys(ZONES).reduce(function(s,k){return s+rec.zones[k].redness;},0)/5);
+  var head=prev&&rec.integrity.ok?(function(){ var po=Math.round(Object.keys(ZONES).reduce(function(s,k){return s+prev.zones[k].redness;},0)/5); var d=overall-po; return d<-6?"Calmer than <em>last time</em>":d>6?"Redder than <em>last time</em>":"Holding <em>steady</em>"; })():"Your <em>reading</em>";
+  return '<div class="label">Your reading <span class="pill">'+fmt(rec.date)+'</span></div><div class="card"><div class="k">Measured, not diagnosed</div><div class="t">'+head+'</div><div class="zoneg">'+zs+'</div></div>'+
+    '<div class="label">Integrity check</div><div class="card">'+flagRow(rec.integrity.ok?"ok":"warn",rec.integrity.ok?"Comparable":"Take it with a pinch of salt",rec.integrity.note)+'</div>';
+}
+/* ---------- the swans ---------- */
+var selA=null, selB=null;
+function renderSwans(c){
+  var ph=S.photos.slice().reverse();
+  var html='<div class="label">The Swans <span class="pill">'+ph.length+' photo'+(ph.length===1?"":"s")+'</span></div>';
+  if(!ph.length){ html+='<div class="card"><div class="t">Nothing here <em>yet</em></div><p>Your photos gather here. Take the first one in Read, in a window, in daylight.</p></div>'; c.innerHTML=html; return; }
+  html+='<div class="card"><div class="k">Tap two to compare</div><div class="grid3" style="margin-top:12px;">'+ph.map(function(p){return '<div class="thumb'+((selA===p.id||selB===p.id)?" sel":"")+'" data-id="'+p.id+'"><img src="'+p.data+'" alt="" /><div class="dt">'+fmt(p.date)+'</div></div>';}).join("")+'</div></div>';
+  html+='<div id="cmp-out"></div>';
+  if(ph.length>=2) html+='<div class="label">What your photos say</div><div class="card" id="insights">'+(correlationInsights().map(function(s){return flagRow(s.sev,s.t,s.d);}).join("")||'<div class="empty">Give it a few more readings and a routine change or two, and patterns will start to show.</div>')+'</div>';
+  c.innerHTML=html;
+  c.querySelectorAll(".thumb").forEach(function(t){ t.onclick=function(){ var id=t.dataset.id; if(selA===id){selA=null;} else if(selB===id){selB=null;} else if(!selA){selA=id;} else if(!selB){selB=id;} else {selA=selB; selB=id;} renderSwans(c); if(selA&&selB) showCompare(); }; });
+  if(selA&&selB) showCompare();
+}
+function showCompare(){
+  var a=S.photos.filter(function(p){return p.id===selA;})[0], b=S.photos.filter(function(p){return p.id===selB;})[0]; if(!a||!b) return;
+  if(a.date>b.date){ var t=a;a=b;b=t; }
+  var ig=integrity(b,a);
+  var deltas=Object.keys(ZONES).map(function(k){ var d=b.zones[k].redness-a.zones[k].redness, ds=b.zones[k].spots-a.zones[k].spots; var txt=Math.abs(d)<6?"steady":(d<0?"calmer by "+Math.abs(d):"redder by "+d); if(ds) txt+=", "+(ds<0?Math.abs(ds)+" fewer spot"+(Math.abs(ds)===1?"":"s"):ds+" more spot"+(ds===1?"":"s")); return '<div class="delta"><span>'+ZONES[k].label+'</span><b style="color:'+(d<-6?"var(--ok)":d>6?"var(--bad)":"var(--ink-soft)")+'">'+txt+'</b></div>'; }).join("");
+  var changes=routineChangesBetween(a.date,b.date);
+  var html='<div class="label">Side by side <span class="pill">'+daysBetween(a.date,b.date)+' days</span></div><div class="card"><div class="cmp"><div><img src="'+a.data+'" alt="" /><div class="cd">'+fmt(a.date)+'</div></div><div><img src="'+b.data+'" alt="" /><div class="cd">'+fmt(b.date)+'</div></div></div>'+
+    '<div style="margin-top:14px;">'+flagRow(ig.ok?"ok":"warn",ig.ok?"A fair comparison":"Not a fair comparison",ig.note)+'</div><div style="margin-top:6px;">'+deltas+'</div>'+
+    (changes.length?'<div class="k" style="margin-top:14px;">What changed between them</div><div style="margin-top:4px;">'+changes.map(function(x){return '<div class="tl-item"><div class="tld">'+fmt(x.date)+'</div><div class="tlt">'+esc(x.text)+'</div></div>';}).join("")+'</div>':'<p style="margin-top:12px;">No routine changes logged between these two.</p>')+
+    '<button class="ghost" id="proof-dl">Save the proof view</button></div>';
+  el("cmp-out").innerHTML=html;
+  el("proof-dl").onclick=function(){ exportProof(a,b,ig,changes); };
+}
+function routineChangesBetween(d1,d2){
+  var ev=timelineEvents().filter(function(e){return e.date>=d1&&e.date<=d2&&e.kind!=="photo"&&e.kind!=="diary";});
+  return ev;
+}
+function exportProof(a,b,ig,changes){
+  var cv=document.createElement("canvas"); cv.width=1080; cv.height=1500; var ctx=cv.getContext("2d");
+  var gr=ctx.createLinearGradient(0,0,1080,1500); gr.addColorStop(0,"#9BA4F0"); gr.addColorStop(1,"#5A63C4"); ctx.fillStyle=gr; ctx.fillRect(0,0,1080,1500);
+  ctx.fillStyle="#fff"; ctx.font="italic 64px 'Instrument Serif',Georgia,serif"; ctx.fillText("Linden.",70,110);
+  ctx.font="500 22px Inter,sans-serif"; ctx.fillStyle="rgba(255,255,255,.8)"; ctx.fillText("READ YOUR SKIN  \u00B7  "+daysBetween(a.date,b.date)+" DAYS APART",70,150);
+  var ia=new Image(), ib=new Image(); var n=0;
+  function done(){ if(++n<2) return;
+    ctx.save(); roundRect(ctx,70,200,450,600,24); ctx.clip(); ctx.drawImage(ia,70,200,450,600); ctx.restore();
+    ctx.save(); roundRect(ctx,560,200,450,600,24); ctx.clip(); ctx.drawImage(ib,560,200,450,600); ctx.restore();
+    ctx.fillStyle="#fff"; ctx.font="500 22px Inter,sans-serif"; ctx.textAlign="center"; ctx.fillText(fmt(a.date).toUpperCase(),295,845); ctx.fillText(fmt(b.date).toUpperCase(),785,845); ctx.textAlign="left";
+    ctx.fillStyle="rgba(255,255,255,.95)"; roundRect(ctx,70,890,940,540,28); ctx.fill();
+    ctx.fillStyle="#1C1F45"; ctx.font="40px 'Instrument Serif',Georgia,serif"; ctx.fillText(ig.ok?"A fair comparison.":"Not a fair comparison.",110,950);
+    ctx.font="400 22px Inter,sans-serif"; ctx.fillStyle="#5A5E8C"; wrap(ctx,ig.note,110,990,860,32);
+    var y=1110; ctx.font="500 24px Inter,sans-serif";
+    Object.keys(ZONES).forEach(function(k){ var d=b.zones[k].redness-a.zones[k].redness; var txt=Math.abs(d)<6?"steady":(d<0?"calmer by "+Math.abs(d):"redder by "+d); ctx.fillStyle="#1C1F45"; ctx.fillText(ZONES[k].label,110,y); ctx.fillStyle=d<-6?"#6E9C74":d>6?"#C4635F":"#5A5E8C"; ctx.textAlign="right"; ctx.fillText(txt,970,y); ctx.textAlign="left"; y+=44; });
+    if(changes.length){ ctx.font="400 20px Inter,sans-serif"; ctx.fillStyle="#5A5E8C"; wrap(ctx,"Changed in between: "+changes.map(function(c){return c.text;}).join("; "),110,y+10,860,28); }
+    ctx.fillStyle="rgba(255,255,255,.7)"; ctx.font="400 18px Inter,sans-serif"; ctx.fillText("Measured, not diagnosed. Copyright 2026 Sonum Samra.",70,1470);
+    var a2=document.createElement("a"); a2.href=cv.toDataURL("image/png"); a2.download="linden-"+a.date+"-to-"+b.date+".png"; a2.click(); toast("Saved.");
+  }
+  ia.onload=done; ib.onload=done; ia.src=a.data; ib.src=b.data;
+}
+function roundRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+function wrap(ctx,text,x,y,maxW,lh){ var words=text.split(" "), line=""; for(var i=0;i<words.length;i++){ var t=line+words[i]+" "; if(ctx.measureText(t).width>maxW&&i>0){ ctx.fillText(line,x,y); line=words[i]+" "; y+=lh; } else line=t; } ctx.fillText(line,x,y); return y; }
+/* ================= PHASE 3: memory and meaning ================= */
+S.diary=S.diary||[];
+var SIGNALS=[
+  ["sting",/\b(sting|stung|stinging|burn|burning|burns|burnt)\b/i,"Stinging on application","barrier"],
+  ["tight",/\b(tight|tightness|taut)\b/i,"Tightness","barrier"],
+  ["dry",/\b(dry|dryness|dehydrated|parched)\b/i,"Dryness","barrier"],
+  ["flake",/\b(flak(e|y|ing|es)|peel(ing)?|shedding)\b/i,"Flaking","barrier"],
+  ["oily",/\b(oily|greasy|shine|shiny|slick)\b/i,"Oiliness","oil"],
+  ["red",/\b(red|redness|flush(ed|ing)?|blotch(y)?|inflamed)\b/i,"Redness","flare"],
+  ["itch",/\b(itch(y|ing)?|irritat(ed|ion|ing))\b/i,"Itching or irritation","flare"],
+  ["bumps",/\b(bumps|bumpy|texture|rough|congest(ed|ion)|clogged)\b/i,"Bumps or congestion","breakout"],
+  ["breakout",/\b(breakout|break out|broke out|spot|spots|pimple|zit|acne|cyst|whitehead|blackhead)\b/i,"Breakout","breakout"],
+  ["calm",/\b(calm|calmer|clear|clearer|glowy|glowing|good day|happy with)\b/i,"A good skin day","good"],
+  ["sleep",/\b(slept (badly|terribly|poorly)|no sleep|bad sleep|insomnia|exhausted|tired)\b/i,"Poor sleep","life"],
+  ["stress",/\b(stress(ed)?|anxious|anxiety|overwhelmed)\b/i,"Stress","life"],
+  ["sun",/\b(sun|sunburn|beach|outside all day|in the sun|hot day)\b/i,"Sun exposure","life"],
+  ["cycle",/\b(period|cycle|hormonal|pms|ovulat)\w*/i,"Cycle note","life"],
+  ["alcohol",/\b(drink(s|ing)?|wines?|beers?|cocktails?|prosecco|hungover|hangover)\b/i,"Alcohol","life"],
+  ["diet",/\b(sugar|dairy|junk|takeaway|ate badly)\b/i,"Diet note","life"],
+  ["newprod",/\b(new (product|serum|cream|cleanser|moisturiser|moisturizer)|started using|tried a new)\b/i,"Started something new","change"],
+  ["travel",/\b(travel(l)?ing|flight|flew|plane|hotel|abroad)\b/i,"Travel","life"],
+  ["workout",/\b(gym|workout|run|ran|sweat(y)?|exercise)\b/i,"Exercise","life"],
+  ["makeup",/\b(makeup|foundation|slept in)\b/i,"Makeup note","life"]
+];
+var FLARE={sting:1,red:1,itch:1,breakout:1,flake:1};
+function translate(text){ var out=[]; SIGNALS.forEach(function(s){ if(s[1].test(text)) out.push({k:s[0],label:s[2],group:s[3]}); }); return out; }
+var recog=null, recording=false;
+function renderDiary(c){
+  var entries=S.diary.slice().reverse().slice(0,14);
+  var html='<div class="label">Skin diary</div>';
+  html+='<div class="card"><div class="k">'+("webkitSpeechRecognition" in window||"SpeechRecognition" in window?"Tap the swan and speak, or type":"Type how it feels")+'</div><div class="t">How is it <em>feeling?</em></div><p>"Tight but oily, stung after moisturiser, slept badly." I will file that properly.</p>'+
+    ("webkitSpeechRecognition" in window||"SpeechRecognition" in window?'<button class="micbtn" id="mic" aria-label="Record"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke-linecap="round"/></svg></button>':'')+
+    '<textarea id="dy-text" placeholder="How does it feel today?" style="margin-top:12px;"></textarea><div id="dy-preview" style="margin-top:6px;"></div><button class="cta" id="dy-save">File it</button></div>';
+  var fl=flareForensics(); if(fl) html+='<div class="label">Flare-up forensics</div><div class="card">'+fl+'</div>';
+  html+='<div class="label">Ask your history</div><div class="card"><input type="text" id="ask" placeholder="When was my skin last calm?" /><div id="ask-out" style="margin-top:10px;"></div><p style="font-size:12px;color:var(--ink-soft);margin-top:8px;">Try: "what changed before the flare", "how long have I used the retinal", "is the azelaic working", "when did my skin improve".</p></div>';
+  if(entries.length) html+='<div class="label">Filed</div><div class="card">'+entries.map(function(e){return '<div class="tl-item"><div class="tld">'+fmt(e.date)+'</div><div class="tlt">'+esc(e.text)+'<div>'+e.signals.map(function(s){return '<span class="sig">'+s.label+'</span>';}).join("")+'</div></div></div>';}).join("")+'</div>';
+  var tl=timelineEvents().slice().reverse().slice(0,20);
+  if(tl.length) html+='<div class="label">Your timeline</div><div class="card">'+tl.map(function(e){return '<div class="tl-item"><div class="tld">'+fmt(e.date)+'</div><div class="tlt">'+esc(e.text)+'</div></div>';}).join("")+'</div>';
+  c.innerHTML=html;
+  var ta=el("dy-text"); ta.addEventListener("input",function(){ var s=translate(ta.value); el("dy-preview").innerHTML=s.map(function(x){return '<span class="sig">'+x.label+'</span>';}).join(""); });
+  el("dy-save").onclick=function(){ var t=ta.value.trim(); if(!t){toast("Say something first.");return;} var e={id:uid(),date:todayISO(),text:t,signals:translate(t)}; S.diary.push(e); save(); toast(e.signals.length?"Filed, "+e.signals.length+" signal"+(e.signals.length===1?"":"s")+" noted.":"Filed."); render(); };
+  var mic=el("mic"); if(mic) mic.onclick=function(){ if(recording){ recog&&recog.stop(); return; } var R=window.SpeechRecognition||window.webkitSpeechRecognition; recog=new R(); recog.lang="en-GB"; recog.interimResults=true; recog.continuous=false; recording=true; mic.classList.add("rec"); var base=ta.value?ta.value+" ":""; recog.onresult=function(ev){ var s=""; for(var i=0;i<ev.results.length;i++) s+=ev.results[i][0].transcript; ta.value=base+s; ta.dispatchEvent(new Event("input")); }; recog.onend=function(){ recording=false; mic.classList.remove("rec"); }; recog.onerror=function(){ recording=false; mic.classList.remove("rec"); toast("Could not hear that. Type instead."); }; recog.start(); };
+  el("ask").addEventListener("keydown",function(e){ if(e.key==="Enter"){ el("ask-out").innerHTML='<p>'+askHistory(el("ask").value)+'</p>'; } });
+}
+/* ---------- timeline ---------- */
+function timelineEvents(){
+  var ev=[];
+  S.products.forEach(function(p){ if(p.added) ev.push({date:p.added,kind:"add",text:"Added "+p.name+(p.status==="cygnet"?" (new to you)":"")}); if(p.started&&p.started!==p.added) ev.push({date:p.started,kind:"start",text:"Started "+p.name}); if(p.retiredOn) ev.push({date:p.retiredOn,kind:"retire",text:"Retired "+p.name}); });
+  S.photos.forEach(function(p){ var avg=Math.round(Object.keys(ZONES).reduce(function(s,k){return s+p.zones[k].redness;},0)/5); ev.push({date:p.date,kind:"photo",text:"Reading: redness "+avg+", "+(p.integrity&&p.integrity.ok?"comparable":"different light")}); });
+  S.diary.forEach(function(d){ ev.push({date:d.date,kind:"diary",text:d.signals.length?d.signals.map(function(s){return s.label;}).join(", "):"Note"}); });
+  var seenMode={}; S.logs.forEach(function(l){ if(l.mode&&l.mode!=="normal"&&!seenMode[l.date]){ seenMode[l.date]=1; ev.push({date:l.date,kind:"mode",text:(MODES[l.mode]||{}).label+" day"}); } });
+  return ev.sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:0;});
+}
+/* ---------- correlations ---------- */
+function avgRed(ph){ return Math.round(Object.keys(ZONES).reduce(function(s,k){return s+ph.zones[k].redness;},0)/5); }
+function avgSpots(ph){ return Object.keys(ZONES).reduce(function(s,k){return s+ph.zones[k].spots;},0); }
+function correlationInsights(){
+  var out=[]; var good=S.photos.filter(function(p){return !p.integrity||p.integrity.ok;});
+  if(good.length<2) return out;
+  S.products.forEach(function(p){
+    var start=p.started||p.added; if(!start) return;
+    var before=good.filter(function(x){return x.date<start&&daysBetween(x.date,start)<=28;});
+    var after=good.filter(function(x){return x.date>start&&daysBetween(start,x.date)>=21&&daysBetween(start,x.date)<=84;});
+    if(!before.length||!after.length) return;
+    var b=before.reduce(function(s,x){return s+avgRed(x);},0)/before.length, a=after.reduce(function(s,x){return s+avgRed(x);},0)/after.length;
+    var bs=before.reduce(function(s,x){return s+avgSpots(x);},0)/before.length, as=after.reduce(function(s,x){return s+avgSpots(x);},0)/after.length;
+    var d=Math.round(((a-b)/Math.max(b,1))*100);
+    if(d<=-15) out.push({sev:"ok",t:"Redness down "+Math.abs(d)+" percent since "+p.name,d:"Comparing readings before it started with readings three to twelve weeks after. Worth keeping."});
+    else if(d>=15) out.push({sev:"warn",t:"Redness up "+d+" percent since "+p.name,d:"That does not prove cause, but it is the change that lines up. Consider easing it back."});
+    if(as-bs<=-2) out.push({sev:"ok",t:"Fewer spots since "+p.name,d:"About "+Math.round(bs-as)+" fewer per reading."});
+  });
+  var last=good[good.length-1], prevs=good.slice(-4,-1);
+  if(prevs.length>=2){ var pm=prevs.reduce(function(s,x){return s+avgRed(x);},0)/prevs.length; var dl=avgRed(last)-pm; if(dl>=12) out.push({sev:"warn",t:"Your latest reading is redder than your recent average",d:"Check the diary for what preceded it."}); }
+  return out;
+}
+function flareForensics(){
+  var t=todayISO(); var recent=S.diary.filter(function(d){return daysBetween(d.date,t)<=3&&d.signals.some(function(s){return FLARE[s.k];});});
+  if(!recent.length) return "";
+  var flare=recent[recent.length-1]; var from=addDays(flare.date,-14);
+  var suspects=[];
+  S.products.forEach(function(p){ var s=p.started||p.added; if(s&&s>=from&&s<=flare.date) suspects.push("Started "+p.name+" on "+fmt(s)); });
+  var L=activeLoad(); if(L.over) suspects.push("Active load is "+L.nights+" a week, over your ceiling of "+L.limit);
+  S.diary.filter(function(d){return d.date>=from&&d.date<flare.date;}).forEach(function(d){ d.signals.filter(function(s){return s.group==="life";}).forEach(function(s){ suspects.push(s.label+" on "+fmt(d.date)); }); });
+  if(S.env&&S.env.uv!==null&&S.env.uv>=6) suspects.push("UV has been high");
+  if(!suspects.length) return flagRow("info","A flare with no obvious change behind it","Nothing new in the last fortnight. Worth watching whether it repeats at the same point in your month.");
+  return flagRow("warn","You logged "+flare.signals.filter(function(s){return FLARE[s.k];}).map(function(s){return s.label.toLowerCase();}).join(" and ")+" on "+fmt(flare.date),"In the fortnight before: "+suspects.join("; ")+".")+
+    '<p style="font-size:13px;margin-top:8px;">The first suspect is usually the most recent change. Ease that back for a week before touching anything else.</p>';
+}
+/* ---------- ask your history ---------- */
+function findProd(q){ var ql=q.toLowerCase(); var hits=S.products.filter(function(p){ return ql.indexOf(p.name.toLowerCase().split(" ")[0])>-1||p.tags.some(function(t){return ql.indexOf((TAGNAMES[t]||t).toLowerCase())>-1;}); }); return hits[0]; }
+function askHistory(q){
+  q=(q||"").trim(); if(!q) return "Ask me something about your skin's history.";
+  var good=S.photos.filter(function(p){return !p.integrity||p.integrity.ok;});
+  if(/calm|clear|good|best|improv/i.test(q)&&/when|last|last time/i.test(q)){
+    if(!good.length) return "I have no comparable readings yet. Take a few in the same light and I will be able to answer this.";
+    var best=good.slice().sort(function(a,b){return avgRed(a)-avgRed(b);})[0];
+    var on=orderRoutine(S.routine.am.concat(S.routine.pm)).map(function(p){return p.name;});
+    var cyg=S.products.filter(function(p){return (p.started||p.added)<=best.date&&p.status!=="retired";}).map(function(p){return p.name;});
+    return "Your calmest comparable reading was "+fmt(best.date)+", redness "+avgRed(best)+". At that point you had "+(cyg.length?cyg.join(", "):"nothing logged")+" on the shelf."+(on.length?" Now you are on "+on.join(", ")+".":"");
+  }
+  if(/what changed|before the flare|before this|caused|why/i.test(q)){
+    var f=flareForensics(); if(f) return f.replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim();
+    var ev=timelineEvents().filter(function(e){return e.kind!=="photo"&&e.kind!=="diary";}).slice(-5);
+    return ev.length?"The most recent changes: "+ev.map(function(e){return e.text+" ("+fmt(e.date)+")";}).join("; ")+". If something is off, the newest change is the first suspect.":"No routine changes logged yet.";
+  }
+  if(/how long|since when|when did i start/i.test(q)){ var p=findProd(q); if(!p) return "Which product? Use its name."; var s=p.started||p.added; return "You have used "+p.name+" for "+daysBetween(s,todayISO())+" days, since "+fmt(s)+"."+(judgement(p)?" "+(judgement(p).ready?"It has had its fair window.":"A fair verdict is in "+judgement(p).left+" days."):""); }
+  if(/working|helping|doing anything|worth it/i.test(q)){
+    var p2=findProd(q); if(!p2) return "Which product? Use its name.";
+    var ins=correlationInsights().filter(function(i){return i.t.indexOf(p2.name)>-1;});
+    var j=judgement(p2);
+    if(ins.length) return ins.map(function(i){return i.t+". "+i.d;}).join(" ");
+    return j&&!j.ready?"Too soon to say. "+p2.name+" needs "+j.left+" more days for a fair verdict, and enough comparable readings on either side.":"Not enough comparable readings around when "+p2.name+" started to say. Keep taking them in the same light.";
+  }
+  if(/what (am|was) i using|routine on|what did i use/i.test(q)){ var m=q.match(/(\d{4}-\d{2}-\d{2})/); var d=m?m[1]:todayISO(); var on2=S.products.filter(function(p){return (p.started||p.added)<=d&&(!p.retiredOn||p.retiredOn>d);}).map(function(p){return p.name;}); return on2.length?"On "+fmt(d)+" you had "+on2.join(", ")+" on the shelf.":"Nothing on the shelf on "+fmt(d)+"."; }
+  if(/load|exfoliat/i.test(q)){ var L=activeLoad(); return "Your active load is "+L.nights+" exfoliating uses a week"+(L.items.length?" across "+L.items.join(", "):"")+". Your ceiling is about "+L.limit+"."; }
+  if(/expir|run out|left/i.test(q)){ var p3=findProd(q); if(p3){ var ex=expiryDate(p3), r=usageRate(p3); return p3.name+(ex?" expires "+fmt(ex)+".":"")+(r?" At your pace, about "+r.daysLeft+" days left.":" Update its level a couple of times and I will learn your pace."); } }
+  return "I can answer when your skin was last calm, what changed before a flare, how long you have used something, whether a product is working, what you were using on a date, your active load, and what is running out. Try one of those.";
+}
+/* ================= PHASE 4: polish ================= */
+/* installable, offline */
+(function(){
+  var manifest={name:"Linden",short_name:"Linden",start_url:"./",display:"standalone",background_color:"#5A63C4",theme_color:"#5A63C4",icons:[{src:"data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240"><rect width="240" height="240" rx="54" fill="#5A63C4"/><g transform="translate(0,45)"><path d="M22 112c0-30 26-52 60-52 14 0 26 3 38 7 9 3 16 4 22 1 9-4 12-14 9-24-2-8-8-14-16-16-7-2-13 0-17 4-3 3-4 7-3 11" fill="#fff"/><path d="M22 112c14 11 36 17 62 17 40 0 72-20 84-48-16 12-38 19-62 19-32 0-60-12-84 12z" fill="#fff"/><path d="M113 41l-10 3 10 3z" fill="#C99A4E"/><circle cx="123" cy="35" r="2.4" fill="#1C1F45"/></g></svg>'),sizes:"240x240",type:"image/svg+xml"}]};
+  var l=document.createElement("link"); l.rel="manifest"; l.href="data:application/manifest+json,"+encodeURIComponent(JSON.stringify(manifest)); document.head.appendChild(l);
+  if("serviceWorker" in navigator&&location.protocol==="https:"){ navigator.serviceWorker.register("./sw.js").catch(function(){}); }
+})();
+/* the Valise handshake: same site, so Linden can see a saved trip */
+function valiseTrip(){
+  try{
+    var trips=JSON.parse(localStorage.getItem("valise_trips")||"[]"); var t=todayISO();
+    return trips.filter(function(x){ if(!x.dstart) return false; var d=daysBetween(t,x.dstart); var e=x.dend?daysBetween(t,x.dend):d; return d<=3&&e>=0; })[0]||null;
+  }catch(e){ return null; }
+}
+/* reminders: computed on open, shown as flags, and as notifications when allowed */
+function dueReminders(){
+  var t=todayISO(), out=[];
+  activeProducts().forEach(function(p){ var j=judgement(p); if(j&&p.status==="cygnet"&&j.left===0) out.push("Verdict day for "+p.name+". Is it working?"); });
+  if(S.env&&S.env.uv!==null&&S.env.uv>=6&&S.env.at===t) out.push("UV is "+Math.round(S.env.uv)+" today. Reapply sunscreen if you are out.");
+  if(S.profile&&S.profile.event&&S.profile.event.date){ var d=daysBetween(t,S.profile.event.date); if(d===7) out.push("One week to "+(S.profile.event.name||"your event")+". Nothing new from here."); }
+  var vt=valiseTrip(); if(vt) out.push("Valise says you are off to "+(vt.dest||"somewhere")+". Travel mode is ready when you are.");
+  return out;
+}
+function fireReminders(){
+  var due=dueReminders(); if(!due.length) return;
+  var key="linden_rem_"+todayISO(); if(store.get(key)) return; store.set(key,1);
+  if("Notification" in window&&Notification.permission==="granted"){ due.forEach(function(m){ try{ new Notification("Linden",{body:m}); }catch(e){} }); }
+  else toast(due[0]);
+}
+/* extra Today flags from phases 2 to 4 */
+var _todayFlags=todayFlags;
+todayFlags=function(){
+  var f=_todayFlags();
+  var vt=valiseTrip(); if(vt&&S.mode!=="travel") f.push(flagRow("info","Valise has you travelling to "+esc(vt.dest||"somewhere")+(vt.climate?", "+vt.climate:""),"Switch to travel mode below and I will go gentler and heavier on hydration."));
+  var fl=flareForensics(); if(fl) f.push(fl);
+  correlationInsights().slice(0,2).forEach(function(s){ f.push(flagRow(s.sev,s.t,s.d)); });
+  var last=S.photos[S.photos.length-1]; if(!last) f.push(flagRow("info","No readings yet","Take your first in Read, in daylight by a window. It becomes the baseline everything compares to."));
+  else if(daysBetween(last.date,todayISO())>=7) f.push(flagRow("info","Time for a reading","It has been "+daysBetween(last.date,todayISO())+" days. Same window, same light."));
+  return f;
+};
+/* retire records a date, for the timeline */
+var _openProduct=openProduct;
+openProduct=function(id){ _openProduct(id); var rb=el("pd-retire"); if(rb){ var orig=rb.onclick; rb.onclick=function(){ var p=getProduct(id); if(p) p.retiredOn=todayISO(); orig(); }; } };
+/* me: notifications */
+var _renderMe=renderMe;
+renderMe=function(c){
+  _renderMe(c);
+  var card=document.createElement("div"); card.className="card";
+  var perm=("Notification" in window)?Notification.permission:"unsupported";
+  card.innerHTML='<div class="k">Reminders</div><p style="margin-top:6px;">Verdict days, high-UV days and the week before an event. '+(perm==="granted"?"On.":perm==="denied"?"Blocked in your browser settings.":perm==="unsupported"?"This browser does not support them; I will use the flags instead.":"")+'</p>'+(perm==="default"?'<button class="ghost" id="notif-btn">Turn on reminders</button>':'');
+  var anchor=c.querySelector(".label:last-of-type"); c.insertBefore(card,anchor?anchor.nextSibling:null);
+  var nb=el("notif-btn"); if(nb) nb.onclick=function(){ Notification.requestPermission().then(function(){ render(); }); };
+};
+/* keyboard: escape closes sheets */
+document.addEventListener("keydown",function(e){ if(e.key==="Escape") closeSheet(); });
+setTimeout(fireReminders,4500);
+/* ================= swans wander ================= */
+function sail(elm,cfg){
+  var W=window.innerWidth, H=window.innerHeight;
+  var top=cfg.lo+Math.random()*(cfg.hi-cfg.lo), w=cfg.wmin+Math.random()*(cfg.wmax-cfg.wmin), dur=cfg.dmin+Math.random()*(cfg.dmax-cfg.dmin), back=Math.random()<0.42, drift=(Math.random()*16-8);
+  elm.style.width=w+"px"; elm.style.top=(top*H)+"px"; elm.style.opacity=cfg.op; elm.style.left="0px";
+  var from=back?(W+w+20):-(w+20), to=back?-(w+40):(W+w+40), sx="scaleX("+(back?-1:1)+")";
+  var anim=elm.animate([{transform:"translateX("+from+"px) "+sx+" translateY(0px)"},{transform:"translateX("+((from+to)/2)+"px) "+sx+" translateY("+drift+"px)",offset:0.5},{transform:"translateX("+to+"px) "+sx+" translateY(0px)"}],{duration:dur,easing:"linear",fill:"forwards"});
+  anim.onfinish=function(){ elm.style.opacity=0; setTimeout(function(){ sail(elm,cfg); },cfg.gapMin+Math.random()*(cfg.gapMax-cfg.gapMin)); };
+}
+if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+  sail(el("swanA"),{lo:0.10,hi:0.70,wmin:120,wmax:176,dmin:26000,dmax:40000,op:0.18,gapMin:1500,gapMax:7000});
+  setTimeout(function(){ sail(el("swanB"),{lo:0.30,hi:0.85,wmin:74,wmax:112,dmin:34000,dmax:52000,op:0.11,gapMin:4000,gapMax:12000}); },5200);
+}
+/* ripples with a feather */
+document.body.addEventListener("click",function(e){
+  if(e.target.closest("button,input,select,textarea,a,.tabs,.sheet")) return;
+  var d=document.createElement("div"); d.className="rip"; d.style.left=e.clientX+"px"; d.style.top=e.clientY+"px";
+  d.innerHTML='<i></i><i></i><i></i><i></i><svg class="fea" viewBox="0 0 60 150"><path d="M30 4c14 22 16 62 6 92-4 12-9 22-14 30-1-9-2-19-2-30 0-42 4-72 10-92z" fill="#fff" fill-opacity=".9"/><path d="M30 8v112" stroke="#7C86E2" stroke-opacity=".5" stroke-width="1.4"/></svg>';
+  document.body.appendChild(d); setTimeout(function(){d.remove();},2400);
+});
+/* opening */
+(function(){ var fog=el("fog"); void fog.offsetWidth; setTimeout(function(){fog.classList.add("glide");},500); setTimeout(function(){fog.classList.add("armed");void fog.offsetWidth;fog.classList.add("clear");},2300); setTimeout(function(){fog.style.display="none";},4200); })();
+/* boot */
+if(S.env&&S.env.at!==todayISO()&&S.loc) fetchEnv().then(render);
+render();
 </script>
 </body>
 </html>
