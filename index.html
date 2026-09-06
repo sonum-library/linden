@@ -78,18 +78,21 @@
   .greet em{font-style:italic;}
   .date{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.65);margin-top:8px;}
   .content{flex:1;padding:6px 16px 110px;}
-  .label{font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.75);margin:22px 4px 10px;display:flex;justify-content:space-between;align-items:center;}
+  .label{font-size:10px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.78);margin:26px 4px 11px;display:flex;justify-content:space-between;align-items:baseline;gap:10px;}
+  .label .meta{font-weight:500;letter-spacing:.18em;color:rgba(255,255,255,.6);}
   .label .pill{background:rgba(255,255,255,.2);border-radius:99px;padding:4px 10px;letter-spacing:.1em;font-size:9px;color:#fff;}
-  .card{background:rgba(255,255,255,.95);border-radius:20px;padding:20px;margin-bottom:12px;box-shadow:0 16px 34px -20px rgba(30,25,80,.5);}
+  .card{background:rgba(255,255,255,.96);border-radius:22px;padding:22px;margin-bottom:13px;box-shadow:0 20px 44px -24px rgba(30,25,80,.55),0 2px 6px -3px rgba(30,25,80,.15);}
   .card .k{font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);}
+  .card .krow{display:flex;justify-content:space-between;align-items:baseline;gap:10px;}
+  .card .krow .km{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--peri-3);}
   .card .t{font-family:var(--serif);font-size:25px;color:var(--ink);line-height:1.2;margin-top:7px;font-weight:400;}
   .card .t em{font-style:italic;color:var(--peri-3);}
   .card p{font-size:14px;color:var(--ink-soft);line-height:1.55;margin-top:9px;}
-  .flag{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid rgba(90,99,196,.13);align-items:flex-start;}
+  .flag{display:flex;gap:13px;padding:16px 0;border-bottom:1px solid rgba(90,99,196,.11);align-items:flex-start;}
   .flag:last-child{border-bottom:none;}
-  .flag .dot{width:7px;height:7px;border-radius:50%;margin-top:6px;flex-shrink:0;}
+  .flag .dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex-shrink:0;box-shadow:0 0 0 4px var(--halo,rgba(124,134,226,.16));}
   .flag .fx{flex:1;} .flag .fn{font-size:14px;font-weight:600;color:var(--ink);} .flag .fd{font-size:13px;color:var(--ink-soft);margin-top:2px;line-height:1.45;}
-  .step{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid rgba(90,99,196,.13);}
+  .step{display:flex;gap:15px;padding:17px 0;border-bottom:1px solid rgba(90,99,196,.11);}
   .step:last-child{border-bottom:none;}
   .step .n{font-family:var(--serif);font-size:22px;color:var(--peri-3);width:26px;flex-shrink:0;line-height:1;}
   .step .sx{flex:1;} .step .sn{font-size:15px;font-weight:600;color:var(--ink);}
@@ -162,13 +165,31 @@
   .micbtn{width:64px;height:64px;border-radius:50%;background:var(--peri-3);border:none;margin:14px auto 0;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 12px 26px -12px var(--peri-3);}
   .micbtn.rec{background:var(--bad);animation:pulse 1.2s ease-in-out infinite;}
   @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.07);}}
+  @keyframes shimmer{0%{background-position:-380px 0;}100%{background-position:380px 0;}}
+  .sk{height:11px;border-radius:7px;background:linear-gradient(90deg,rgba(124,134,226,.12) 0%,rgba(124,134,226,.22) 50%,rgba(124,134,226,.12) 100%);background-size:380px 100%;animation:shimmer 1.5s infinite;margin:7px 0;}
+  .skrow{display:flex;gap:12px;align-items:flex-start;margin:12px 0;}
+  .skrow .sqr{width:34px;height:34px;border-radius:9px;background:var(--mist);flex-shrink:0;}
+  .skrow .sqr.big{width:44px;height:44px;}
+  .loadmark{width:40px;opacity:.5;margin-bottom:12px;}
+  .emptywrap{text-align:center;padding:26px 10px 10px;}
+  .emptywrap svg{opacity:.55;margin-bottom:14px;}
+  .emptywrap .et{font-family:var(--serif);font-size:24px;color:var(--ink);margin-bottom:8px;}
+  .emptywrap .et em{font-style:italic;color:var(--peri-3);}
+  .emptywrap p{font-size:14px;color:var(--ink-soft);max-width:280px;margin:0 auto 16px;}
+  .rangewrap{margin-top:10px;}
+  .rangewrap input[type=range]{width:100%;-webkit-appearance:none;height:6px;border-radius:99px;background:linear-gradient(90deg,var(--peri-3) 0%,var(--peri-3) var(--fill,50%),rgba(90,99,196,.18) var(--fill,50%),rgba(90,99,196,.18) 100%);outline:none;}
+  .rangewrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:2px solid var(--peri-3);box-shadow:0 4px 12px -4px rgba(30,25,80,.5);cursor:pointer;}
+  .rangewrap input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:#fff;border:2px solid var(--peri-3);cursor:pointer;}
+  .rangewrap .rl{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--ink-soft);}
+  .rangeval{font-family:var(--serif);font-size:30px;color:var(--peri-3);text-align:center;}
+  .rangeval span{font-family:var(--sans);font-size:13px;color:var(--ink-soft);letter-spacing:.14em;text-transform:uppercase;display:block;margin-top:2px;}
   .view{display:none;} .view.on{display:block;}
   .env{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px;}
   .env div{background:var(--mist);border-radius:12px;padding:11px 8px;text-align:center;}
   .env .ev{font-family:var(--serif);font-size:22px;color:var(--ink);} .env .el{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-top:2px;}
   .modes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
   .mode{appearance:none;border:1px solid rgba(90,99,196,.22);background:#fff;border-radius:12px;padding:12px;text-align:left;cursor:pointer;font-family:var(--sans);}
-  .mode[aria-pressed=true]{background:var(--peri-3);border-color:var(--peri-3);} .mode[aria-pressed=true] *{color:#fff;}
+  .mode{transition:all .15s;} .mode[aria-pressed=true]{background:var(--peri-3);border-color:var(--peri-3);box-shadow:0 10px 22px -12px var(--peri-3);} .mode[aria-pressed=true] *{color:#fff;}
   .mode .mn{font-size:13px;font-weight:600;color:var(--ink);} .mode .md{font-size:11px;color:var(--ink-soft);margin-top:2px;}
   .ob{padding:24px 0;}
   .ob h2{font-family:var(--serif);font-size:38px;color:#fff;font-weight:400;line-height:1.05;}
@@ -522,13 +543,13 @@ function renderToday(c){
   var done=logged&&logged[half]&&logged[half].length;
   var html='';
   html+='<div class="label">'+(half==="am"?"This morning":"Tonight")+' <span class="pill">'+MODES[S.mode].label+'</span></div>';
-  if(!prods.length){ html+='<div class="card"><div class="t">Nothing planned for <em>'+(half==="am"?"mornings":"evenings")+'</em> yet</div><p>Go to your shelf, open a product, and choose when you use it.</p></div>'; }
+  if(!prods.length){ html+='<div class="card"><div class="emptywrap"><svg width="54" height="34" viewBox="0 0 240 150" fill="none" stroke="var(--peri-3)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M60 120c-18-10-28-30-24-52 4-24 26-40 50-38 18 2 30 14 34 30"/><path d="M60 120c22 12 54 12 82-4 26-15 40-40 38-64"/></svg><div class="et">Nothing planned for <em>'+(half==="am"?"the morning":"tonight")+'</em></div><p>Add a product to your shelf and choose when you use it. I will handle the order.</p><button class="cta" id="empty-add" style="max-width:240px;margin:0 auto;">Go to the shelf</button></div></div>'; }
   else {
     html+='<div class="card">'+prods.map(function(p,i){ var cat=CATS[p.cat]||CATS.serum; return '<div class="step"><div class="n">'+(i+1)+'</div><div class="sx"><div class="sn">'+esc(p.name)+(p.cat==="spf"&&(p.spf||p.pa)?' <span class="cygnet" style="background:#F6F1E4;color:var(--warn);">'+esc([p.spf?"SPF "+p.spf:"",p.pa||""].filter(Boolean).join(" "))+'</span>':'')+(p.status==="cygnet"?'<span class="cygnet">Cygnet</span>':'')+'</div><div class="sd">'+cat.dose+'</div><div><span class="sw">'+esc(cat.where)+'</span></div></div></div>'; }).join("")+
       '<button class="cta" id="log-done">'+(done?"Logged. Change it":"Done, log it")+'</button></div>';
   }
   var flags=todayFlags();
-  html+='<div class="label">Worth knowing'+(flags.length?' <span class="pill">'+flags.length+'</span>':'')+'</div>';
+  var flagn=["","one","two","three","four","five","six","seven","eight","nine","ten"]; html+='<div class="label">Worth knowing<span class="meta">'+(flags.length?(flagn[flags.length]||flags.length)+" flag"+(flags.length===1?"":"s"):"all clear")+'</span></div>';
   html+='<div class="card">'+(flags.length?flags.join(""):'<div class="empty">Nothing to flag. That is either very good or a very empty shelf.</div>')+'</div>';
   html+='<div class="label">Today\'s mode</div><div class="card"><div class="modes">'+Object.keys(MODES).map(function(k){return '<button class="mode" data-m="'+k+'" aria-pressed="'+(S.mode===k)+'"><div class="mn">'+MODES[k].label+'</div><div class="md">'+MODES[k].desc+'</div></button>';}).join("")+'</div></div>';
   html+='<div class="label">Where you are</div><div class="card">';
@@ -536,6 +557,7 @@ function renderToday(c){
   else { html+='<div class="t">Let me see the <em>weather</em></div><p>UV, humidity and air quality where you are, so the routine can adjust.</p><button class="cta" id="env-go">Use my location</button>'; }
   html+='</div>';
   c.innerHTML=html;
+  var ea=el("empty-add"); if(ea) ea.onclick=function(){ setView("shelf"); };
   var lb=el("log-done"); if(lb) lb.onclick=function(){ var t=todayISO(); var l=S.logs.filter(function(x){return x.date===t;})[0]; if(!l){ l={date:t,am:[],pm:[]}; S.logs.push(l); } l[half]=prods.map(function(p){return p.id;}); l.mode=S.mode; save(); toast("Logged. Well done."); render(); };
   document.querySelectorAll(".mode").forEach(function(b){ b.onclick=function(){ S.mode=b.dataset.m; save(); render(); }; });
   var eg=el("env-go"); if(eg) eg.onclick=function(){ toast("Finding you..."); locate(render); };
@@ -588,13 +610,13 @@ function openAddProduct(prefill){
     '<div id="spf-fields" hidden><div class="row2"><div><label class="fl">SPF</label><input type="number" id="ap-spf" placeholder="50" min="5" max="100" /></div><div><label class="fl">PA rating</label><select id="ap-pa"><option value="">Not shown</option><option>PA+</option><option>PA++</option><option>PA+++</option><option>PA++++</option></select></div></div></div>'+
     '<label class="fl">Ingredients</label><textarea id="ap-ings" placeholder="Optional, but this is how I read what is in it. Paste the list, or let me find it above.">'+esc(prefill.ings||"")+'</textarea>'+
     '<div class="row2"><div><label class="fl">Opened on</label><input type="date" id="ap-opened" value="'+todayISO()+'" /></div><div><label class="fl">Expiry, months</label><input type="number" id="ap-pao" placeholder="auto" min="1" max="36" /></div></div>'+
-    '<label class="fl">How full is it?</label><div class="level" id="ap-level">'+LEVELS.map(function(l){return '<button type="button" data-l="'+l[0]+'" aria-pressed="'+(l[0]===100)+'">'+l[1]+'</button>';}).join("")+'</div>'+
+    '<label class="fl">How full is it?</label><div class="rangewrap"><div class="rangeval" id="ap-lvlval">Full<span>100 percent</span></div><input type="range" id="ap-level" min="0" max="100" step="5" value="100" /><div class="rl"><span>Empty</span><span>Half</span><span>Full</span></div></div>'+
     '<label class="fl">When do you use it?</label><div class="chips"><button class="chip" id="ap-am" aria-pressed="false" type="button">Mornings</button><button class="chip" id="ap-pm" aria-pressed="false" type="button">Evenings</button></div>'+
     '<label class="fl">Is this new to you?</label><div class="chips"><button class="chip" id="ap-new" aria-pressed="false" type="button">Yes, just starting it</button></div>'+
     '<label class="fl">Have the packaging?</label><div id="scan-area"><button class="ghost" id="scan-btn" style="margin-top:0;">Scan the barcode</button><div id="scan-host"></div></div>'+
     '<button class="cta" id="ap-save">Add it</button><button class="ghost" id="ap-cancel">Cancel</button>');
   var lvl=100;
-  el("ap-level").querySelectorAll("button").forEach(function(b){ b.onclick=function(){ lvl=+b.dataset.l; el("ap-level").querySelectorAll("button").forEach(function(x){x.setAttribute("aria-pressed",x===b);}); }; });
+  var apr=el("ap-level"); function apPaint(){ lvl=+apr.value; apr.style.setProperty("--fill",lvl+"%"); el("ap-lvlval").innerHTML=levelLabel(lvl)+"<span>"+lvl+" percent</span>"; } apr.oninput=apPaint; apPaint();
   ["ap-am","ap-pm","ap-new"].forEach(function(id){ el(id).onclick=function(){ el(id).setAttribute("aria-pressed",el(id).getAttribute("aria-pressed")!=="true"); }; });
   el("ap-cat").onchange=function(){ var cat=CATS[el("ap-cat").value]; el("ap-am").setAttribute("aria-pressed",!!cat.am); el("ap-pm").setAttribute("aria-pressed",!!cat.pm); el("spf-fields").hidden=el("ap-cat").value!=="spf"; };
   el("ap-cat").onchange();
@@ -661,7 +683,7 @@ function openProduct(id){
   var p=getProduct(id); if(!p) return; var cat=CATS[p.cat]||CATS.serum; var ex=expiryDate(p); var r=usageRate(p); var j=judgement(p);
   var inAM=S.routine.am.indexOf(id)>-1, inPM=S.routine.pm.indexOf(id)>-1;
   openSheet('<h3>'+esc(p.name)+'</h3><p style="color:var(--ink-soft);font-size:13px;margin-top:4px;">'+esc([p.brand,cat.label].filter(Boolean).join(" \u00B7 "))+'</p>'+
-    '<label class="fl">How full is it now?</label><div class="level" id="pd-level">'+LEVELS.map(function(l){return '<button type="button" data-l="'+l[0]+'" aria-pressed="'+(levelLabel(p.level||0)===l[1])+'">'+l[1]+'</button>';}).join("")+'</div>'+
+    '<label class="fl">How full is it now?</label><div class="rangewrap"><div class="rangeval" id="pd-lvlval">'+levelLabel(p.level||0)+'<span>'+(p.level||0)+' percent</span></div><input type="range" id="pd-level" min="0" max="100" step="5" value="'+(p.level||0)+'" /><div class="rl"><span>Empty</span><span>Half</span><span>Full</span></div></div>'+
     (r?'<p style="font-size:13px;color:var(--ink-soft);margin-top:8px;">At your pace, about '+r.daysLeft+' days left. Yours, not the average.</p>':'<p style="font-size:13px;color:var(--ink-soft);margin-top:8px;">Update the level now and then and I will learn your pace.</p>')+
     '<label class="fl">In your routine</label><div class="chips" style="margin-top:2px;"><button class="chip" id="pd-am" aria-pressed="'+inAM+'" type="button">Mornings</button><button class="chip" id="pd-pm" aria-pressed="'+inPM+'" type="button">Evenings</button></div>'+
     (p.cat==="spf"?'<div class="row2"><div><label class="fl">SPF</label><input type="number" id="pd-spf" value="'+(p.spf||"")+'" placeholder="50" /></div><div><label class="fl">PA rating</label><select id="pd-pa">'+["","PA+","PA++","PA+++","PA++++"].map(function(v){return '<option value="'+v+'"'+(p.pa===v?" selected":"")+'>'+(v||"Not shown")+'</option>';}).join("")+'</select></div></div>':'')+
@@ -672,7 +694,7 @@ function openProduct(id){
     '<button class="cta" id="pd-save">Save</button>'+
     '<div class="chips" style="margin-top:12px;justify-content:space-between;"><button class="link" id="pd-cygnet">'+(p.status==="cygnet"?"It has earned its place":"Mark as new to me")+'</button><button class="link danger" id="pd-retire">Retire it</button></div>');
   var lvl=p.level;
-  el("pd-level").querySelectorAll("button").forEach(function(b){ b.onclick=function(){ lvl=+b.dataset.l; el("pd-level").querySelectorAll("button").forEach(function(x){x.setAttribute("aria-pressed",x===b);}); }; });
+  var pdr=el("pd-level"); function pdPaint(){ lvl=+pdr.value; pdr.style.setProperty("--fill",lvl+"%"); el("pd-lvlval").innerHTML=levelLabel(lvl)+"<span>"+lvl+" percent</span>"; } pdr.oninput=pdPaint; pdPaint();
   ["pd-am","pd-pm","pd-exempt","pd-okay"].forEach(function(k){ var e2=el(k); if(e2) e2.onclick=function(){ e2.setAttribute("aria-pressed",e2.getAttribute("aria-pressed")!=="true"); }; });
   var removed={}; el("pd-tags").querySelectorAll(".chip").forEach(function(b){ b.onclick=function(){ var on=b.getAttribute("aria-pressed")==="true"; b.setAttribute("aria-pressed",!on); removed[b.dataset.t]=on; }; });
   el("pd-save").onclick=function(){
@@ -872,7 +894,7 @@ var selA=null, selB=null;
 function renderSwans(c){
   var ph=S.photos.slice().reverse();
   var html='<div class="label">The Swans <span class="pill">'+ph.length+' photo'+(ph.length===1?"":"s")+'</span></div>';
-  if(!ph.length){ html+='<div class="card"><div class="t">Nothing here <em>yet</em></div><p>Your photos gather here. Take the first one in Read, in a window, in daylight.</p></div>'; c.innerHTML=html; return; }
+  if(!ph.length){ html+='<div class="card"><div class="emptywrap"><svg width="60" height="38" viewBox="0 0 240 150" fill="none" stroke="var(--peri-3)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M40 118c-20-12-30-34-26-58 5-27 30-45 56-42 20 2 33 15 37 33"/><path d="M40 118c24 14 60 14 92-4 28-16 44-44 42-70"/><path d="M132 51c9-6 22-6 30 0"/></svg><div class="et">The archive is <em>empty</em></div><p>Your readings gather here, side by side across weeks. Take the first in Read, by a window in daylight.</p><button class="cta" id="swan-first" style="max-width:240px;margin:0 auto;">Take the first reading</button></div></div>'; c.innerHTML=html; var sf=el("swan-first"); if(sf) sf.onclick=function(){ setView("read"); }; return; }
   html+='<div class="card"><div class="k">Tap two to compare</div><div class="grid3" style="margin-top:12px;">'+ph.map(function(p){return '<div class="thumb'+((selA===p.id||selB===p.id)?" sel":"")+'" data-id="'+p.id+'"><img src="'+p.data+'" alt="" /><div class="dt">'+fmt(p.date)+'</div></div>';}).join("")+'</div></div>';
   html+='<div id="cmp-out"></div>';
   if(ph.length>=2) html+='<div class="label">What your photos say</div><div class="card" id="insights">'+(correlationInsights().map(function(s){return flagRow(s.sev,s.t,s.d);}).join("")||'<div class="empty">Give it a few more readings and a routine change or two, and patterns will start to show.</div>')+'</div>';
@@ -951,7 +973,7 @@ function renderDiary(c){
   var entries=S.diary.slice().reverse().slice(0,14);
   var html='<div class="label">Skin diary</div>';
   html+='<div class="card"><div class="k">'+("webkitSpeechRecognition" in window||"SpeechRecognition" in window?"Tap the swan and speak, or type":"Type how it feels")+'</div><div class="t">How is it <em>feeling?</em></div><p>"Tight but oily, stung after moisturiser, slept badly." I will file that properly.</p>'+
-    ("webkitSpeechRecognition" in window||"SpeechRecognition" in window?'<button class="micbtn" id="mic" aria-label="Record"><svg width="40" height="26" viewBox="0 0 240 150" fill="none"><path d="M22 112c0-30 26-52 60-52 14 0 26 3 38 7 9 3 16 4 22 1 9-4 12-14 9-24-2-8-8-14-16-16-7-2-13 0-17 4-3 3-4 7-3 11" fill="#fff"/><path d="M22 112c14 11 36 17 62 17 40 0 72-20 84-48-16 12-38 19-62 19-32 0-60-12-84 12z" fill="#fff"/><path d="M113 41l-10 3 10 3z" fill="#C99A4E"/><circle cx="123" cy="35" r="2.4" fill="#5A63C4"/></svg></button>':'')+
+    ("webkitSpeechRecognition" in window||"SpeechRecognition" in window?'<button class="micbtn" id="mic" aria-label="Record"><svg width="46" height="30" viewBox="0 0 240 150" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M60 120c-18-10-28-30-24-52 4-24 26-40 50-38 18 2 30 14 34 30"/><path d="M60 120c22 12 54 12 82-4 26-15 40-40 38-64"/><path d="M120 56c8-6 20-6 28 0"/></svg></button>':'')+
     '<textarea id="dy-text" placeholder="How does it feel today?" style="margin-top:12px;"></textarea><div id="dy-preview" style="margin-top:6px;"></div><button class="cta" id="dy-save">File it</button></div>';
   var fl=flareForensics(); if(fl) html+='<div class="label">Flare-up forensics</div><div class="card">'+fl+'</div>';
   html+='<div class="label">Ask your history</div><div class="card"><input type="text" id="ask" placeholder="When was my skin last calm?" /><div id="ask-out" style="margin-top:10px;"></div><p style="font-size:12px;color:var(--ink-soft);margin-top:8px;">Try: "what changed before the flare", "how long have I used the retinal", "is the azelaic working", "when did my skin improve".</p></div>';
