@@ -241,7 +241,7 @@ function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").
 var CATS={
   cleanser:{label:"Cleanser",order:10,am:1,pm:1,dose:"A coin-sized amount, worked into damp skin for a full minute.",where:"Full face, down to the jaw. Rinse thoroughly.",pao:12,window:2},
   toner:{label:"Toner or essence",order:20,am:1,pm:1,dose:"A few drops pressed in with your hands, or a lightly damp pad.",where:"Full face, avoiding the eye area.",pao:12,window:4},
-  vitc:{label:"Vitamin C serum",order:30,am:1,pm:0,dose:"Four to five drops. Press in, do not rub.",where:"Full face and neck, avoiding the immediate eye area.",pao:3,window:10},
+  vitc:{label:"Vitamin C serum",order:30,am:1,pm:0,dose:"Four to five drops. Press in, do not rub.",where:"Full face and neck, avoiding the immediate eye area.",pao:6,window:10},
   exfoliant:{label:"Acid or exfoliant",order:32,am:0,pm:1,dose:"A thin layer, or a few drops. Less than you think.",where:"Full face, avoiding the eye area and the corners of the nose and mouth.",pao:12,window:6},
   azelaic:{label:"Azelaic acid",order:34,am:1,pm:1,dose:"A pea-sized amount for the whole face.",where:"Full face, or spot-targeted on red areas.",pao:12,window:10},
   niacinamide:{label:"Niacinamide serum",order:36,am:1,pm:1,dose:"Three to four drops.",where:"Full face.",pao:12,window:8},
@@ -259,7 +259,7 @@ var CATS={
 /* ================= ingredient tags ================= */
 var TAGRULES=[
   ["retinoid",/\b(retinol|retinal|retinaldehyde|tretinoin|adapalene|tazarotene|retinyl|hydroxypinacolone retinoate|granactive)\b/i],
-  ["aha",/\b(glycolic|lactic|mandelic|malic|tartaric|citric acid)\b/i],
+  ["aha",/\b(glycolic|lactic|mandelic|malic|tartaric)\b/i],
   ["bha",/\b(salicylic|betaine salicylate)\b/i],
   ["pha",/\b(gluconolactone|lactobionic|galactose)\b/i],
   ["vitc",/\b(ascorbic|ascorbyl|ascorbate|ethyl ascorbic|tetrahexyldecyl)\b/i],
@@ -281,7 +281,16 @@ var TAGRULES=[
 var TAGNAMES={retinoid:"retinoid",aha:"AHA",bha:"BHA",pha:"PHA",vitc:"vitamin C",bp:"benzoyl peroxide",niacinamide:"niacinamide",azelaic:"azelaic acid",copper:"copper peptides",peptide:"peptides",spf:"SPF",fragrance:"fragrance",alcohol:"drying alcohol",oil:"oils or occlusives",hydroquinone:"hydroquinone",tranexamic:"tranexamic acid",sulfur:"sulfur",ceramide:"ceramides",ha:"hyaluronic acid"};
 function detectTags(ings,cat){
   var t={};
-  TAGRULES.forEach(function(r){ if(r[1].test(ings||"")) t[r[0]]=1; });
+  var list=(ings||"").split(/[,;\n]+/).map(function(s){return s.trim();}).filter(Boolean);
+  TAGRULES.forEach(function(r){
+    if(!r[1].test(ings||"")) return;
+    // acids far down a list are pH adjusters or preservatives, not actives
+    if(r[0]==="aha"||r[0]==="bha"||r[0]==="pha"){
+      var idx=-1; for(var i=0;i<list.length;i++){ if(r[1].test(list[i])){ idx=i; break; } }
+      if(idx>9) return;
+    }
+    t[r[0]]=1;
+  });
   // the category implies the active even without a pasted list
   if(cat==="retinoid") t.retinoid=1;
   if(cat==="vitc") t.vitc=1;
@@ -359,6 +368,7 @@ function activeLoad(){
   // exfoliating applications per week, across the whole shelf
   var nights=0, items=[];
   activeProducts().forEach(function(p){
+    if(p.loadExempt) return;
     var ex=p.tags.some(function(t){return EXFOL_TAGS[t];});
     if(!ex) return;
     var f=p.freq||((S.routine.pm.indexOf(p.id)>-1||S.routine.am.indexOf(p.id)>-1)?7:0);
@@ -494,7 +504,7 @@ function todayFlags(){
   var L=activeLoad(); if(L.over) f.push(flagRow("warn","Active load is "+L.nights+" exfoliating uses a week","Your skin's comfortable ceiling is about "+L.limit+". Across "+L.items.join(", ")+"."));
   // expiry and levels
   activeProducts().forEach(function(p){
-    var ex=expiryDate(p); if(ex){ var d=daysBetween(t,ex); if(d<0) f.push(flagRow("bad",esc(p.name)+" expired "+Math.abs(d)+" days ago","Opened "+fmt(p.opened)+". Vitamin C and retinoids in particular lose potency; sunscreen loses protection.")); else if(d<=21) f.push(flagRow("warn",esc(p.name)+" expires in "+d+" days","Use it up or let it go.")); }
+    var ex=expiryDate(p); if(ex&&!(p.okUntil&&p.okUntil>=t)){ var d=daysBetween(t,ex); var why=p.cat==="spf"?"Sunscreen genuinely loses protection past this. Replace it.":p.tags.indexOf("vitc")>-1?"This is the maker's period-after-opening, a guide rather than a hard stop. The real test for vitamin C is colour: pale and fresh-smelling is fine, orange or metallic is done.":"This is the maker's period-after-opening, a guide rather than a hard stop. If it looks, smells and feels the same, open the product and tell me it is still good."; if(d<0) f.push(flagRow(p.cat==="spf"?"bad":"warn",esc(p.name)+" is "+Math.abs(d)+" days past its PAO",why)); else if(d<=21) f.push(flagRow("info",esc(p.name)+" reaches its PAO in "+d+" days",why)); }
     var r=usageRate(p); if(r&&r.daysLeft<=14&&p.level>0) f.push(flagRow("warn",esc(p.name)+" runs out in about "+r.daysLeft+" days","At your logged rate. Yours, not the average."));
     if(p.level!==undefined&&p.level<=10) f.push(flagRow("info",esc(p.name)+" is nearly empty","Decide now whether it earned a repurchase."));
     var j=judgement(p); if(j&&p.status==="cygnet"&&!j.ready) f.push(flagRow("info","Too soon to judge "+esc(p.name),"A fair verdict is in "+j.left+" days. Change nothing else until then."));
@@ -514,7 +524,7 @@ function renderToday(c){
   html+='<div class="label">'+(half==="am"?"This morning":"Tonight")+' <span class="pill">'+MODES[S.mode].label+'</span></div>';
   if(!prods.length){ html+='<div class="card"><div class="t">Nothing planned for <em>'+(half==="am"?"mornings":"evenings")+'</em> yet</div><p>Go to your shelf, open a product, and choose when you use it.</p></div>'; }
   else {
-    html+='<div class="card">'+prods.map(function(p,i){ var cat=CATS[p.cat]||CATS.serum; return '<div class="step"><div class="n">'+(i+1)+'</div><div class="sx"><div class="sn">'+esc(p.name)+(p.status==="cygnet"?'<span class="cygnet">Cygnet</span>':'')+'</div><div class="sd">'+cat.dose+'</div><div><span class="sw">'+esc(cat.where)+'</span></div></div></div>'; }).join("")+
+    html+='<div class="card">'+prods.map(function(p,i){ var cat=CATS[p.cat]||CATS.serum; return '<div class="step"><div class="n">'+(i+1)+'</div><div class="sx"><div class="sn">'+esc(p.name)+(p.cat==="spf"&&(p.spf||p.pa)?' <span class="cygnet" style="background:#F6F1E4;color:var(--warn);">'+esc([p.spf?"SPF "+p.spf:"",p.pa||""].filter(Boolean).join(" "))+'</span>':'')+(p.status==="cygnet"?'<span class="cygnet">Cygnet</span>':'')+'</div><div class="sd">'+cat.dose+'</div><div><span class="sw">'+esc(cat.where)+'</span></div></div></div>'; }).join("")+
       '<button class="cta" id="log-done">'+(done?"Logged. Change it":"Done, log it")+'</button></div>';
   }
   var flags=todayFlags();
@@ -542,7 +552,7 @@ function renderShelf(c){
   if(prods.length){
     html+='<div class="card">'+prods.map(function(p){
       var cat=CATS[p.cat]||CATS.serum; var ex=expiryDate(p); var r=usageRate(p); var j=judgement(p);
-      var meta=[cat.label]; if(p.tags.length) meta.push(p.tags.map(function(t){return TAGNAMES[t]||t;}).slice(0,3).join(", "));
+      var meta=[cat.label]; if(p.cat==="spf"&&(p.spf||p.pa)) meta.push([p.spf?"SPF "+p.spf:"",p.pa||""].filter(Boolean).join(" ")); if(p.tags.length) meta.push(p.tags.map(function(t){return TAGNAMES[t]||t;}).slice(0,3).join(", "));
       var line2=[]; if(ex) line2.push("expires "+fmt(ex)); if(r) line2.push("~"+r.daysLeft+" days left at your pace"); if(j&&p.status==="cygnet") line2.push(j.ready?"ready to judge":"verdict in "+j.left+" days");
       var when=[]; if(S.routine.am.indexOf(p.id)>-1)when.push("AM"); if(S.routine.pm.indexOf(p.id)>-1)when.push("PM");
       return '<div class="prod"><div class="pn">'+esc(p.name)+(p.status==="cygnet"?'<span class="cygnet">Cygnet</span>':'')+(when.length?'<span class="cygnet" style="background:#EEF6EF;color:var(--ok);">'+when.join(" + ")+'</span>':'<span class="cygnet" style="background:#F6F1E4;color:var(--warn);">not in routine</span>')+'</div>'+
@@ -575,6 +585,7 @@ function openAddProduct(prefill){
     '<label class="fl">Brand</label><input type="text" id="ap-brand" placeholder="e.g. Glow Recipe" value="'+esc(prefill.brand||"")+'" />'+
     '<button class="ghost" id="find-btn" style="margin-top:10px;">Find it by name</button><div id="find-host"></div>'+
     '<label class="fl">What kind of product</label><select id="ap-cat">'+cats+'</select>'+
+    '<div id="spf-fields" hidden><div class="row2"><div><label class="fl">SPF</label><input type="number" id="ap-spf" placeholder="50" min="5" max="100" /></div><div><label class="fl">PA rating</label><select id="ap-pa"><option value="">Not shown</option><option>PA+</option><option>PA++</option><option>PA+++</option><option>PA++++</option></select></div></div></div>'+
     '<label class="fl">Ingredients</label><textarea id="ap-ings" placeholder="Optional, but this is how I read what is in it. Paste the list, or let me find it above.">'+esc(prefill.ings||"")+'</textarea>'+
     '<div class="row2"><div><label class="fl">Opened on</label><input type="date" id="ap-opened" value="'+todayISO()+'" /></div><div><label class="fl">Expiry, months</label><input type="number" id="ap-pao" placeholder="auto" min="1" max="36" /></div></div>'+
     '<label class="fl">How full is it?</label><div class="level" id="ap-level">'+LEVELS.map(function(l){return '<button type="button" data-l="'+l[0]+'" aria-pressed="'+(l[0]===100)+'">'+l[1]+'</button>';}).join("")+'</div>'+
@@ -585,7 +596,7 @@ function openAddProduct(prefill){
   var lvl=100;
   el("ap-level").querySelectorAll("button").forEach(function(b){ b.onclick=function(){ lvl=+b.dataset.l; el("ap-level").querySelectorAll("button").forEach(function(x){x.setAttribute("aria-pressed",x===b);}); }; });
   ["ap-am","ap-pm","ap-new"].forEach(function(id){ el(id).onclick=function(){ el(id).setAttribute("aria-pressed",el(id).getAttribute("aria-pressed")!=="true"); }; });
-  el("ap-cat").onchange=function(){ var cat=CATS[el("ap-cat").value]; el("ap-am").setAttribute("aria-pressed",!!cat.am); el("ap-pm").setAttribute("aria-pressed",!!cat.pm); };
+  el("ap-cat").onchange=function(){ var cat=CATS[el("ap-cat").value]; el("ap-am").setAttribute("aria-pressed",!!cat.am); el("ap-pm").setAttribute("aria-pressed",!!cat.pm); el("spf-fields").hidden=el("ap-cat").value!=="spf"; };
   el("ap-cat").onchange();
   el("ap-cancel").onclick=closeSheet;
   el("scan-btn").onclick=startScan;
@@ -593,7 +604,7 @@ function openAddProduct(prefill){
   el("ap-save").onclick=function(){
     var name=el("ap-name").value.trim(); if(!name){ toast("It needs a name."); return; }
     var cat=el("ap-cat").value, ings=el("ap-ings").value.trim();
-    var p={id:uid(),name:name,brand:el("ap-brand").value.trim(),cat:cat,ings:ings,tags:detectTags(ings,cat),opened:el("ap-opened").value||todayISO(),pao:parseInt(el("ap-pao").value,10)||null,level:lvl,levelLog:[{date:todayISO(),level:lvl}],added:todayISO(),status:(el("ap-new").getAttribute("aria-pressed")==="true")?"cygnet":"active",started:todayISO()};
+    var p={id:uid(),name:name,brand:el("ap-brand").value.trim(),cat:cat,ings:ings,tags:detectTags(ings,cat),opened:el("ap-opened").value||todayISO(),pao:parseInt(el("ap-pao").value,10)||null,level:lvl,levelLog:[{date:todayISO(),level:lvl}],added:todayISO(),status:(el("ap-new").getAttribute("aria-pressed")==="true")?"cygnet":"active",started:todayISO(),spf:parseInt(el("ap-spf").value,10)||null,pa:el("ap-pa").value||""};
     S.products.push(p);
     if(el("ap-am").getAttribute("aria-pressed")==="true") S.routine.am.push(p.id);
     if(el("ap-pm").getAttribute("aria-pressed")==="true") S.routine.pm.push(p.id);
@@ -653,19 +664,27 @@ function openProduct(id){
     '<label class="fl">How full is it now?</label><div class="level" id="pd-level">'+LEVELS.map(function(l){return '<button type="button" data-l="'+l[0]+'" aria-pressed="'+(levelLabel(p.level||0)===l[1])+'">'+l[1]+'</button>';}).join("")+'</div>'+
     (r?'<p style="font-size:13px;color:var(--ink-soft);margin-top:8px;">At your pace, about '+r.daysLeft+' days left. Yours, not the average.</p>':'<p style="font-size:13px;color:var(--ink-soft);margin-top:8px;">Update the level now and then and I will learn your pace.</p>')+
     '<label class="fl">In your routine</label><div class="chips" style="margin-top:2px;"><button class="chip" id="pd-am" aria-pressed="'+inAM+'" type="button">Mornings</button><button class="chip" id="pd-pm" aria-pressed="'+inPM+'" type="button">Evenings</button></div>'+
-    (p.tags.some(function(t){return EXFOL_TAGS[t];})?'<label class="fl">Uses per week</label><input type="number" id="pd-freq" min="1" max="14" value="'+(p.freq||((inAM?7:0)+(inPM?7:0))||3)+'" />':'')+
+    (p.cat==="spf"?'<div class="row2"><div><label class="fl">SPF</label><input type="number" id="pd-spf" value="'+(p.spf||"")+'" placeholder="50" /></div><div><label class="fl">PA rating</label><select id="pd-pa">'+["","PA+","PA++","PA+++","PA++++"].map(function(v){return '<option value="'+v+'"'+(p.pa===v?" selected":"")+'>'+(v||"Not shown")+'</option>';}).join("")+'</select></div></div>':'')+
+    '<label class="fl">What I read in it <span style="font-weight:400;letter-spacing:0;text-transform:none;">(tap to remove if I got it wrong)</span></label><div class="chips" id="pd-tags">'+(p.tags.length?p.tags.map(function(t){return '<button class="chip" type="button" data-t="'+t+'" aria-pressed="true">'+(TAGNAMES[t]||t)+'</button>';}).join(""):'<span class="small">Nothing of note, or no ingredient list yet.</span>')+'</div>'+
+    (p.tags.some(function(t){return EXFOL_TAGS[t];})?'<label class="fl">Uses per week</label><input type="number" id="pd-freq" min="1" max="14" value="'+(p.freq||((inAM?7:0)+(inPM?7:0))||3)+'" /><div class="chips" style="margin-top:10px;"><button class="chip" type="button" id="pd-exempt" aria-pressed="'+(!!p.loadExempt)+'">Do not count it as exfoliating, my skin is happy</button></div>':'')+
+    (ex&&daysBetween(todayISO(),ex)<=21?'<div class="chips" style="margin-top:14px;"><button class="chip" type="button" id="pd-okay">It is still good, check again in 3 months</button></div>':'')+
     '<div class="card" style="box-shadow:none;background:var(--mist);margin-top:14px;"><div class="k">How to use it</div><p style="margin-top:6px;"><b>Dose.</b> '+cat.dose+'</p><p><b>Where.</b> '+cat.where+'</p>'+(ex?'<p><b>Expires.</b> '+fmt(ex)+' (opened '+fmt(p.opened)+').</p>':'')+(j?'<p><b>Judgement.</b> '+(j.ready?"It has had its "+j.weeks+" weeks. Time for an honest verdict.":"A fair verdict on this takes about "+j.weeks+" weeks. That is "+fmt(j.verdict)+".")+'</p>':'')+(p.tags.length?'<p><b>I read.</b> '+esc(p.tags.map(function(t){return TAGNAMES[t]||t;}).join(", "))+'.</p>':'')+'</div>'+
     '<button class="cta" id="pd-save">Save</button>'+
     '<div class="chips" style="margin-top:12px;justify-content:space-between;"><button class="link" id="pd-cygnet">'+(p.status==="cygnet"?"It has earned its place":"Mark as new to me")+'</button><button class="link danger" id="pd-retire">Retire it</button></div>');
   var lvl=p.level;
   el("pd-level").querySelectorAll("button").forEach(function(b){ b.onclick=function(){ lvl=+b.dataset.l; el("pd-level").querySelectorAll("button").forEach(function(x){x.setAttribute("aria-pressed",x===b);}); }; });
-  ["pd-am","pd-pm"].forEach(function(k){ el(k).onclick=function(){ el(k).setAttribute("aria-pressed",el(k).getAttribute("aria-pressed")!=="true"); }; });
+  ["pd-am","pd-pm","pd-exempt","pd-okay"].forEach(function(k){ var e2=el(k); if(e2) e2.onclick=function(){ e2.setAttribute("aria-pressed",e2.getAttribute("aria-pressed")!=="true"); }; });
+  var removed={}; el("pd-tags").querySelectorAll(".chip").forEach(function(b){ b.onclick=function(){ var on=b.getAttribute("aria-pressed")==="true"; b.setAttribute("aria-pressed",!on); removed[b.dataset.t]=on; }; });
   el("pd-save").onclick=function(){
     if(lvl!==p.level){ p.level=lvl; p.levelLog=(p.levelLog||[]); p.levelLog.push({date:todayISO(),level:lvl}); }
     var am=el("pd-am").getAttribute("aria-pressed")==="true", pm=el("pd-pm").getAttribute("aria-pressed")==="true";
     S.routine.am=S.routine.am.filter(function(i){return i!==id;}); S.routine.pm=S.routine.pm.filter(function(i){return i!==id;});
     if(am) S.routine.am.push(id); if(pm) S.routine.pm.push(id);
     var fq=el("pd-freq"); if(fq) p.freq=parseInt(fq.value,10)||null;
+    p.tags=p.tags.filter(function(t){return !removed[t];});
+    var exb=el("pd-exempt"); if(exb) p.loadExempt=exb.getAttribute("aria-pressed")==="true";
+    var okb=el("pd-okay"); if(okb&&okb.getAttribute("aria-pressed")==="true"){ p.okUntil=addDays(todayISO(),90); toast("Noted. I will ask again in three months."); }
+    var sp=el("pd-spf"); if(sp) p.spf=parseInt(sp.value,10)||null; var pa=el("pd-pa"); if(pa) p.pa=pa.value;
     save(); closeSheet(); render();
   };
   el("pd-cygnet").onclick=function(){ p.status=p.status==="cygnet"?"active":"cygnet"; if(p.status==="cygnet")p.started=todayISO(); save(); closeSheet(); render(); };
@@ -932,7 +951,7 @@ function renderDiary(c){
   var entries=S.diary.slice().reverse().slice(0,14);
   var html='<div class="label">Skin diary</div>';
   html+='<div class="card"><div class="k">'+("webkitSpeechRecognition" in window||"SpeechRecognition" in window?"Tap the swan and speak, or type":"Type how it feels")+'</div><div class="t">How is it <em>feeling?</em></div><p>"Tight but oily, stung after moisturiser, slept badly." I will file that properly.</p>'+
-    ("webkitSpeechRecognition" in window||"SpeechRecognition" in window?'<button class="micbtn" id="mic" aria-label="Record"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke-linecap="round"/></svg></button>':'')+
+    ("webkitSpeechRecognition" in window||"SpeechRecognition" in window?'<button class="micbtn" id="mic" aria-label="Record"><svg width="40" height="26" viewBox="0 0 240 150" fill="none"><path d="M22 112c0-30 26-52 60-52 14 0 26 3 38 7 9 3 16 4 22 1 9-4 12-14 9-24-2-8-8-14-16-16-7-2-13 0-17 4-3 3-4 7-3 11" fill="#fff"/><path d="M22 112c14 11 36 17 62 17 40 0 72-20 84-48-16 12-38 19-62 19-32 0-60-12-84 12z" fill="#fff"/><path d="M113 41l-10 3 10 3z" fill="#C99A4E"/><circle cx="123" cy="35" r="2.4" fill="#5A63C4"/></svg></button>':'')+
     '<textarea id="dy-text" placeholder="How does it feel today?" style="margin-top:12px;"></textarea><div id="dy-preview" style="margin-top:6px;"></div><button class="cta" id="dy-save">File it</button></div>';
   var fl=flareForensics(); if(fl) html+='<div class="label">Flare-up forensics</div><div class="card">'+fl+'</div>';
   html+='<div class="label">Ask your history</div><div class="card"><input type="text" id="ask" placeholder="When was my skin last calm?" /><div id="ask-out" style="margin-top:10px;"></div><p style="font-size:12px;color:var(--ink-soft);margin-top:8px;">Try: "what changed before the flare", "how long have I used the retinal", "is the azelaic working", "when did my skin improve".</p></div>';
