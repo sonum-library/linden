@@ -212,8 +212,6 @@
   .step.logged .sn{opacity:.55;}
   .step.logged .sd,.step.logged .sw{opacity:.5;}
 </style>
-<!-- Umami analytics (self-hosted, privacy-first, no cookies) -->
-<script defer src="https://umami-phi-smoky.vercel.app/script.js" data-website-id="8ad9ab18-bd56-4038-a5c1-4ab62849ff24"></script>
 </head>
 <body>
 <div class="mesh"></div>
@@ -402,23 +400,25 @@ function activeLoad(){
     if(isDevice(p)||p.loadExempt) return;
     var ex=(p.tags||[]).some(function(t){return EXFOL_TAGS[t];});
     if(!ex) return;
+    if(p.freq==="prn") return;
     var f=p.freq||((S.routine.pm.indexOf(p.id)>-1||S.routine.am.indexOf(p.id)>-1)?7:0);
     if(f>0){ nights+=f; items.push(p.name+" ("+f+" a week)"); }
   });
-  var limit=(S.profile&&S.profile.sens==="reactive")?2:(S.profile&&S.profile.sens==="sensitive")?3:5;
-  return {nights:nights,limit:limit,items:items,over:nights>limit};
+  var auto=(S.profile&&S.profile.sens==="reactive")?2:(S.profile&&S.profile.sens==="sensitive")?3:5;
+  var limit=(S.profile&&S.profile.loadCeiling)?S.profile.loadCeiling:auto;
+  return {nights:nights,limit:limit,items:items,auto:auto,custom:!!(S.profile&&S.profile.loadCeiling),over:nights>limit};
 }
 /* ================= ordering ================= */
 /* ---------- devices: tools on the shelf, not topicals. No load, no
    judgement, no consumption, no expiry. They take a slot and a frequency. ---------- */
 var DEVICES={
-  led:{label:"LED mask",order:34,am:0,pm:1,note:"Ten minutes on clean, dry skin. Serums go on after, not before."},
-  microcurrent:{label:"Microcurrent",order:36,am:0,pm:1,note:"Over its conductive gel, five to ten minutes. Not over broken skin."},
-  wand:{label:"High-frequency wand",order:33,am:0,pm:1,note:"Short passes on clean skin. Skip it on active retinoid nights."},
-  ice:{label:"Ice or cooling globes",order:8,am:1,pm:0,note:"A minute or two on clean skin, to calm and settle the morning."},
-  roller:{label:"Gua sha or roller",order:72,am:0,pm:1,note:"A few minutes over your moisturiser or oil, gentle and upward."},
-  derma:{label:"Dermaroller",order:31,am:0,pm:1,note:"Its own night. Nothing acid or retinoid the same evening, clean everything first."},
-  other:{label:"Other device",order:55,am:0,pm:1,note:"As its maker directs."}
+  led:{label:"LED mask",order:34,am:0,pm:1,mins:null,note:"On clean, dry skin. Serums go on after, not before. Timings vary a lot between masks, so follow your own manufacturer's guidance and set the minutes below."},
+  microcurrent:{label:"Microcurrent",order:36,am:0,pm:1,mins:null,note:"Over its conductive gel, never on dry skin. Not over broken skin. Set your device's own timing below."},
+  wand:{label:"High-frequency wand",order:33,am:0,pm:1,mins:null,note:"Short passes on clean skin. Skip it on active retinoid nights."},
+  ice:{label:"Ice or cooling globes",order:8,am:1,pm:0,mins:null,note:"On clean skin, to calm and settle. Keep it brief and keep it moving."},
+  roller:{label:"Gua sha or roller",order:72,am:0,pm:1,mins:null,note:"Over your moisturiser or oil, gentle and upward. Never drag on bare skin."},
+  derma:{label:"Dermaroller",order:31,am:0,pm:1,mins:null,note:"Its own night. Nothing acid or retinoid the same evening, and clean everything first."},
+  other:{label:"Other device",order:55,am:0,pm:1,mins:null,note:"As its maker directs."}
 };
 function isDevice(p){ return p&&p.kind==="device"; }
 function deviceMeta(p){ return DEVICES[p.dev]||DEVICES.other; }
@@ -572,7 +572,7 @@ function renderToday(c){
     var doneIds=(logged&&logged[half])?logged[half]:[];
     html+='<div class="card">'+prods.map(function(p,i){
       var dv=isDevice(p), cat=dv?null:(CATS[p.cat]||CATS.serum);
-      var dose=dv?deviceMeta(p).note:cat.dose, where=dv?"":cat.where;
+      var dose=dv?((p.note||deviceMeta(p).note)+(p.mins?" "+p.mins+" minutes.":"")):cat.dose, where=dv?"":cat.where;
       var on=doneIds.indexOf(p.id)>-1;
       return '<div class="step'+(on?' logged':'')+'" data-log="'+p.id+'"><div class="n">'+(i+1)+'</div><div class="sx"><div class="sn">'+esc(p.name)+(dv?' <span class="cygnet" style="background:#EEF0FF;color:var(--peri-3);">Device</span>':'')+(!dv&&p.cat==="spf"&&(p.spf||p.pa)?' <span class="cygnet" style="background:#F6F1E4;color:var(--warn);">'+esc([p.spf?"SPF "+p.spf:"",p.pa||""].filter(Boolean).join(" "))+'</span>':'')+(p.status==="cygnet"?'<span class="cygnet">Cygnet</span>':'')+'</div><div class="sd">'+dose+'</div>'+(where?'<div><span class="sw">'+esc(where)+'</span></div>':'')+'</div><button class="logdot" type="button" aria-pressed="'+on+'" aria-label="Mark used"></button></div>';
     }).join("")+
@@ -620,9 +620,9 @@ function renderShelf(c){
     html+='<div class="card">'+prods.map(function(p){
       var dv=isDevice(p); var cat=dv?null:(CATS[p.cat]||CATS.serum); var ex=expiryDate(p); var r=usageRate(p); var j=judgement(p);
       var meta=[dv?deviceMeta(p).label:cat.label];
-      if(dv){ if(p.freq) meta.push(p.freq+" a week"); }
+      if(dv){ if(p.freq) meta.push(p.freq+" a week"); if(p.mins) meta.push(p.mins+" min"); }
       else { if(p.cat==="spf"&&(p.spf||p.pa)) meta.push([p.spf?"SPF "+p.spf:"",p.pa||""].filter(Boolean).join(" ")); if(p.tags.length) meta.push(p.tags.map(function(t){return TAGNAMES[t]||t;}).slice(0,3).join(", ")); }
-      var line2=[]; if(ex) line2.push("expires "+fmt(ex)); if(r) line2.push("~"+r.daysLeft+" days left at your pace"); if(j&&p.status==="cygnet") line2.push(j.ready?"ready to judge":"verdict in "+j.left+" days");
+      var line2=[]; if(p.freq==="prn") line2.push("as needed"); else if(!dv&&p.freq) line2.push(p.freq+" a week"); if(ex) line2.push("expires "+fmt(ex)); if(r) line2.push("~"+r.daysLeft+" days left at your pace"); if(j&&p.status==="cygnet") line2.push(j.ready?"ready to judge":"verdict in "+j.left+" days");
       var when=[]; if(S.routine.am.indexOf(p.id)>-1)when.push("AM"); if(S.routine.pm.indexOf(p.id)>-1)when.push("PM");
       return '<div class="prod"><div class="pn">'+esc(p.name)+(dv?'<span class="cygnet" style="background:#EEF0FF;color:var(--peri-3);">Device</span>':'')+(p.status==="cygnet"?'<span class="cygnet">Cygnet</span>':'')+(when.length?'<span class="cygnet" style="background:#EEF6EF;color:var(--ok);">'+when.join(" + ")+'</span>':'<span class="cygnet" style="background:#F6F1E4;color:var(--warn);">not in routine</span>')+'</div>'+
         '<div class="pm">'+esc(meta.join(" \u00B7 "))+(line2.length?' \u00B7 '+esc(line2.join(" \u00B7 ")):'')+'</div>'+
@@ -639,6 +639,16 @@ function renderShelf(c){
   c.querySelectorAll("[data-restore]").forEach(function(b){ b.onclick=function(){ var p=getProduct(b.dataset.restore); p.status="active"; save(); render(); }; });
   c.querySelectorAll("[data-del]").forEach(function(b){ b.onclick=function(){ if(confirm("Delete for good?")){ S.products=S.products.filter(function(p){return p.id!==b.dataset.del;}); ["am","pm"].forEach(function(h){S.routine[h]=S.routine[h].filter(function(i){return i!==b.dataset.del;});}); save(); render(); } }; });
 }
+/* a chip that toggles, and clears the number beside it when switched on */
+function wirePRN(chipId,numId){
+  var ch=el(chipId); if(!ch) return;
+  ch.onclick=function(){
+    var on=ch.getAttribute("aria-pressed")!=="true";
+    ch.setAttribute("aria-pressed",on);
+    var n=el(numId); if(n){ n.disabled=on; if(on) n.value=""; }
+  };
+  var n=el(numId); if(n&&ch.getAttribute("aria-pressed")==="true") n.disabled=true;
+}
 /* ---------- devices: add and edit ---------- */
 function openAddDevice(){
   var opts=Object.keys(DEVICES).map(function(k){return '<option value="'+k+'">'+DEVICES[k].label+'</option>';}).join("");
@@ -648,6 +658,8 @@ function openAddDevice(){
     '<div id="dv-note" class="small" style="margin-top:8px;"></div>'+
     '<label class="fl">When do you use it?</label><div class="chips"><button class="chip" id="dv-am" aria-pressed="false" type="button">Mornings</button><button class="chip" id="dv-pm" aria-pressed="false" type="button">Evenings</button></div>'+
     '<label class="fl">How many times a week?</label><input type="number" id="dv-freq" min="1" max="14" placeholder="e.g. 3" />'+
+    '<label class="fl">How long, in minutes?</label><input type="number" id="dv-mins" min="1" max="120" placeholder="whatever your manufacturer says" />'+
+    '<label class="fl">Your own note, optional</label><input type="text" id="dv-note" placeholder="e.g. red mode, eyes shut" />'+
     '<button class="cta" id="dv-save">Add it</button><button class="ghost" id="dv-cancel">Cancel</button>');
   function syncType(){ var d=DEVICES[el("dv-type").value]; el("dv-note").textContent=d.note; el("dv-am").setAttribute("aria-pressed",!!d.am); el("dv-pm").setAttribute("aria-pressed",!!d.pm); if(!el("dv-name").value) el("dv-name").placeholder="e.g. my "+d.label.toLowerCase(); }
   el("dv-type").onchange=syncType; syncType();
@@ -655,7 +667,7 @@ function openAddDevice(){
   el("dv-cancel").onclick=closeSheet;
   el("dv-save").onclick=function(){
     var dev=el("dv-type").value, name=el("dv-name").value.trim()||DEVICES[dev].label;
-    var p={id:uid(),kind:"device",dev:dev,name:name,tags:[],freq:parseInt(el("dv-freq").value,10)||null,added:todayISO(),started:todayISO(),status:"active"};
+    var p={id:uid(),kind:"device",dev:dev,name:name,tags:[],freq:parseInt(el("dv-freq").value,10)||null,mins:parseInt(el("dv-mins").value,10)||null,note:el("dv-note").value.trim()||"",added:todayISO(),started:todayISO(),status:"active"};
     S.products.push(p);
     if(el("dv-am").getAttribute("aria-pressed")==="true") S.routine.am.push(p.id);
     if(el("dv-pm").getAttribute("aria-pressed")==="true") S.routine.pm.push(p.id);
@@ -666,9 +678,11 @@ function openDevice(id){
   var p=getProduct(id); if(!p) return; var d=deviceMeta(p);
   var inAM=S.routine.am.indexOf(id)>-1, inPM=S.routine.pm.indexOf(id)>-1;
   openSheet('<h3>'+esc(p.name)+'</h3><p style="color:var(--ink-soft);font-size:13px;margin-top:4px;">'+esc(d.label)+' \u00B7 device</p>'+
-    '<div class="card" style="box-shadow:none;background:var(--mist);margin-top:6px;"><div class="k">How to use it</div><p style="margin-top:6px;">'+esc(d.note)+'</p></div>'+
+    '<div class="card" style="box-shadow:none;background:var(--mist);margin-top:6px;"><div class="k">How to use it</div><p style="margin-top:6px;">'+esc(p.note||d.note)+(p.mins?' <strong>'+p.mins+' minutes.</strong>':'')+'</p></div>'+
     '<label class="fl">In your routine</label><div class="chips" style="margin-top:2px;"><button class="chip" id="dv-am" aria-pressed="'+inAM+'" type="button">Mornings</button><button class="chip" id="dv-pm" aria-pressed="'+inPM+'" type="button">Evenings</button></div>'+
     '<label class="fl">How many times a week?</label><input type="number" id="dv-freq" min="1" max="14" placeholder="e.g. 3" value="'+(p.freq||"")+'" />'+
+    '<label class="fl">How long, in minutes?</label><input type="number" id="dv-mins" min="1" max="120" placeholder="whatever your manufacturer says" value="'+(p.mins||"")+'" />'+
+    '<label class="fl">Your own note</label><input type="text" id="dv-note" placeholder="overrides mine" value="'+esc(p.note||"")+'" />'+
     '<button class="cta" id="dv-save">Save</button>'+
     '<div class="chips" style="margin-top:12px;justify-content:flex-end;"><button class="link danger" id="dv-del">Remove it</button></div>');
   ["dv-am","dv-pm"].forEach(function(k){ el(k).onclick=function(){ el(k).setAttribute("aria-pressed",el(k).getAttribute("aria-pressed")!=="true"); }; });
@@ -677,6 +691,8 @@ function openDevice(id){
     S.routine.am=S.routine.am.filter(function(i){return i!==id;}); S.routine.pm=S.routine.pm.filter(function(i){return i!==id;});
     if(am) S.routine.am.push(id); if(pm) S.routine.pm.push(id);
     p.freq=parseInt(el("dv-freq").value,10)||null;
+    p.mins=parseInt(el("dv-mins").value,10)||null;
+    p.note=el("dv-note").value.trim()||"";
     save(); closeSheet(); render();
   };
   el("dv-del").onclick=function(){ if(confirm("Remove this device?")){ S.products=S.products.filter(function(x){return x.id!==id;}); ["am","pm"].forEach(function(h){S.routine[h]=S.routine[h].filter(function(i){return i!==id;});}); save(); closeSheet(); render(); } };
@@ -704,7 +720,7 @@ function openAddProduct(prefill){
     '<div class="row2"><div><label class="fl">Opened on</label><input type="date" id="ap-opened" value="'+todayISO()+'" /></div><div><label class="fl">Expiry, months</label><input type="number" id="ap-pao" placeholder="auto" min="1" max="36" /></div></div>'+
     '<label class="fl">How full is it?</label><div class="rangewrap"><div class="rangeval" id="ap-lvlval">Full<span>100 percent</span></div><input type="range" id="ap-level" min="0" max="100" step="5" value="100" /><div class="rl"><span>Empty</span><span>Half</span><span>Full</span></div></div>'+
     '<label class="fl">When do you use it?</label><div class="chips"><button class="chip" id="ap-am" aria-pressed="false" type="button">Mornings</button><button class="chip" id="ap-pm" aria-pressed="false" type="button">Evenings</button></div>'+
-    '<label class="fl">How many times a week?</label><input type="number" id="ap-freq" min="1" max="14" placeholder="e.g. 3, or leave blank for daily" />'+
+    '<label class="fl">How many times a week?</label><input type="number" id="ap-freq" min="1" max="14" placeholder="e.g. 3, or leave blank for daily" /><div class="chips" style="margin-top:8px;"><button class="chip" type="button" id="ap-prn" aria-pressed="false">As needed, no set pattern</button></div>'+
     '<label class="fl">Is this new to you?</label><div class="chips"><button class="chip" id="ap-new" aria-pressed="false" type="button">Yes, just starting it</button></div>'+
     '<label class="fl">Have the packaging?</label><div id="scan-area"><button class="ghost" id="scan-btn" style="margin-top:0;">Scan the barcode</button><div id="scan-host"></div></div>'+
     '<button class="cta" id="ap-save">Add it</button><button class="ghost" id="ap-cancel">Cancel</button>');
@@ -716,10 +732,11 @@ function openAddProduct(prefill){
   el("ap-cancel").onclick=closeSheet;
   el("scan-btn").onclick=startScan;
   el("find-btn").onclick=function(){ lookupByName(el("ap-brand").value.trim(),el("ap-name").value.trim()); };
+  wirePRN("ap-prn","ap-freq");
   el("ap-save").onclick=function(){
     var name=el("ap-name").value.trim(); if(!name){ toast("It needs a name."); return; }
     var cat=el("ap-cat").value, ings=el("ap-ings").value.trim();
-    var p={id:uid(),name:name,brand:el("ap-brand").value.trim(),cat:cat,ings:ings,tags:detectTags(ings,cat),opened:el("ap-opened").value||todayISO(),pao:parseInt(el("ap-pao").value,10)||null,level:lvl,levelLog:[{date:todayISO(),level:lvl}],added:todayISO(),status:(el("ap-new").getAttribute("aria-pressed")==="true")?"cygnet":"active",started:todayISO(),spf:parseInt(el("ap-spf").value,10)||null,pa:el("ap-pa").value||"",freq:parseInt(el("ap-freq").value,10)||null};
+    var p={id:uid(),name:name,brand:el("ap-brand").value.trim(),cat:cat,ings:ings,tags:detectTags(ings,cat),opened:el("ap-opened").value||todayISO(),pao:parseInt(el("ap-pao").value,10)||null,level:lvl,levelLog:[{date:todayISO(),level:lvl}],added:todayISO(),status:(el("ap-new").getAttribute("aria-pressed")==="true")?"cygnet":"active",started:todayISO(),spf:parseInt(el("ap-spf").value,10)||null,pa:el("ap-pa").value||"",freq:(el("ap-prn")&&el("ap-prn").getAttribute("aria-pressed")==="true")?"prn":(parseInt(el("ap-freq").value,10)||null)};
     S.products.push(p);
     if(el("ap-am").getAttribute("aria-pressed")==="true") S.routine.am.push(p.id);
     if(el("ap-pm").getAttribute("aria-pressed")==="true") S.routine.pm.push(p.id);
@@ -781,7 +798,7 @@ function openProduct(id){
     '<label class="fl">In your routine</label><div class="chips" style="margin-top:2px;"><button class="chip" id="pd-am" aria-pressed="'+inAM+'" type="button">Mornings</button><button class="chip" id="pd-pm" aria-pressed="'+inPM+'" type="button">Evenings</button></div>'+
     (p.cat==="spf"?'<div class="row2"><div><label class="fl">SPF</label><input type="number" id="pd-spf" value="'+(p.spf||"")+'" placeholder="50" /></div><div><label class="fl">PA rating</label><select id="pd-pa">'+["","PA+","PA++","PA+++","PA++++"].map(function(v){return '<option value="'+v+'"'+(p.pa===v?" selected":"")+'>'+(v||"Not shown")+'</option>';}).join("")+'</select></div></div>':'')+
     '<label class="fl">What I read in it <span style="font-weight:400;letter-spacing:0;text-transform:none;">(tap to remove if I got it wrong)</span></label><div class="chips" id="pd-tags">'+(p.tags.length?p.tags.map(function(t){return '<button class="chip" type="button" data-t="'+t+'" aria-pressed="true">'+(TAGNAMES[t]||t)+'</button>';}).join(""):'<span class="small">Nothing of note, or no ingredient list yet.</span>')+'</div>'+
-    '<label class="fl">How many times a week?</label><input type="number" id="pd-freq" min="1" max="14" placeholder="daily" value="'+(p.freq||"")+'" />'+
+    '<label class="fl">How many times a week?</label><input type="number" id="pd-freq" min="1" max="14" placeholder="daily" value="'+(p.freq==="prn"?"":(p.freq||""))+'" /><div class="chips" style="margin-top:8px;"><button class="chip" type="button" id="pd-prn" aria-pressed="'+(p.freq==="prn")+'">As needed, no set pattern</button></div>'+
     (p.tags.some(function(t){return EXFOL_TAGS[t];})?'<div class="chips" style="margin-top:10px;"><button class="chip" type="button" id="pd-exempt" aria-pressed="'+(!!p.loadExempt)+'">Do not count it as exfoliating, my skin is happy</button></div>':'')+
     (ex&&daysBetween(todayISO(),ex)<=21?'<div class="chips" style="margin-top:14px;"><button class="chip" type="button" id="pd-okay">It is still good, check again in 3 months</button></div>':'')+
     '<div class="card" style="box-shadow:none;background:var(--mist);margin-top:14px;"><div class="k">How to use it</div><p style="margin-top:6px;"><b>Dose.</b> '+cat.dose+'</p><p><b>Where.</b> '+cat.where+'</p>'+(ex?'<p><b>Expires.</b> '+fmt(ex)+' (opened '+fmt(p.opened)+').</p>':'')+(j?'<p><b>Judgement.</b> '+(j.ready?"It has had its "+j.weeks+" weeks. Time for an honest verdict.":"A fair verdict on this takes about "+j.weeks+" weeks. That is "+fmt(j.verdict)+".")+'</p>':'')+(p.tags.length?'<p><b>I read.</b> '+esc(p.tags.map(function(t){return TAGNAMES[t]||t;}).join(", "))+'.</p>':'')+'</div>'+
@@ -791,12 +808,14 @@ function openProduct(id){
   var pdr=el("pd-level"); function pdPaint(){ lvl=+pdr.value; pdr.style.setProperty("--fill",lvl+"%"); el("pd-lvlval").innerHTML=levelLabel(lvl)+"<span>"+lvl+" percent</span>"; } pdr.oninput=pdPaint; pdPaint();
   ["pd-am","pd-pm","pd-exempt","pd-okay"].forEach(function(k){ var e2=el(k); if(e2) e2.onclick=function(){ e2.setAttribute("aria-pressed",e2.getAttribute("aria-pressed")!=="true"); }; });
   var removed={}; el("pd-tags").querySelectorAll(".chip").forEach(function(b){ b.onclick=function(){ var on=b.getAttribute("aria-pressed")==="true"; b.setAttribute("aria-pressed",!on); removed[b.dataset.t]=on; }; });
+  wirePRN("pd-prn","pd-freq");
   el("pd-save").onclick=function(){
     if(lvl!==p.level){ p.level=lvl; p.levelLog=(p.levelLog||[]); p.levelLog.push({date:todayISO(),level:lvl}); }
     var am=el("pd-am").getAttribute("aria-pressed")==="true", pm=el("pd-pm").getAttribute("aria-pressed")==="true";
     S.routine.am=S.routine.am.filter(function(i){return i!==id;}); S.routine.pm=S.routine.pm.filter(function(i){return i!==id;});
     if(am) S.routine.am.push(id); if(pm) S.routine.pm.push(id);
-    var fq=el("pd-freq"); if(fq) p.freq=parseInt(fq.value,10)||null;
+    var prn=el("pd-prn"); var fq=el("pd-freq");
+    p.freq=(prn&&prn.getAttribute("aria-pressed")==="true")?"prn":(fq?(parseInt(fq.value,10)||null):p.freq);
     p.tags=p.tags.filter(function(t){return !removed[t];});
     var exb=el("pd-exempt"); if(exb) p.loadExempt=exb.getAttribute("aria-pressed")==="true";
     var okb=el("pd-okay"); if(okb&&okb.getAttribute("aria-pressed")==="true"){ p.okUntil=addDays(todayISO(),90); toast("Noted. I will ask again in three months."); }
@@ -851,11 +870,18 @@ function renderMe(c){
   var pf=S.profile; var streak=S.logs.length;
   var html='<div class="label">You</div><div class="card"><div class="t">'+esc(pf.name)+', <em>'+esc(pf.skin)+'</em> and '+esc(pf.sens==="resilient"?"resilient":pf.sens)+'</div><p>Working on: '+esc(pf.goals.map(function(g){return g;}).join(", "))+'.</p><p>'+streak+' day'+(streak===1?"":"s")+' logged so far.</p></div>';
   html+='<div class="label">Anything coming up?</div><div class="card"><div class="k">Pre-event lockdown</div><p style="margin-top:6px;">Tell me the date and nothing new goes near your face in the week before it.</p><div class="row2" style="margin-top:8px;"><div><input type="text" id="ev-name" placeholder="The wedding" value="'+esc((pf.event||{}).name||"")+'" /></div><div><input type="date" id="ev-date" value="'+esc((pf.event||{}).date||"")+'" /></div></div><button class="cta" id="ev-save">Save</button></div>';
+  var Ld0=activeLoad();
+  html+='<div class="label">Your ceiling</div><div class="card"><div class="k">Exfoliating uses a week</div>'+
+    '<p style="margin-top:6px;">I start everyone at '+Ld0.auto+' a week based on how you said your skin reacts. That is a starting point, not a verdict. Skin differs, and some actives sit fine nightly for one person and not another. Set your own number if you know better.</p>'+
+    '<input type="number" id="me-ceil" min="1" max="14" placeholder="'+Ld0.auto+' (my suggestion)" value="'+((pf.loadCeiling)||"")+'" />'+
+    '<p style="font-size:12px;color:var(--ink-soft);margin-top:8px;">If one particular product is the thing miscounted, open it on your shelf and tick "do not count it as exfoliating" instead. That is the better fix for a single product.</p>'+
+    '<button class="ghost" id="me-ceil-save">Save</button></div>';
   html+='<div class="label">Notes for your clinician</div><div class="card"><div class="k">Export</div><p style="margin-top:6px;">A plain summary of your shelf, routine, changes and what you have logged, to take to an appointment.</p><button class="ghost" id="exp-btn">Copy the summary</button></div>';
   html+='<div class="label">Your data</div><div class="card"><p>Everything lives in this browser, on this device. Nothing is sent anywhere. Clearing your browser data clears Linden too.</p><button class="ghost" id="reset-btn" style="color:var(--bad);border-color:rgba(196,99,95,.35);">Start over completely</button></div>';
   html+='<p style="text-align:center;font-size:11px;color:rgba(255,255,255,.6);margin-top:18px;">Linden reads and measures. It does not diagnose. See a clinician for anything that worries you.<br>Copyright 2026 Sonum Samra. All rights reserved.</p>';
   c.innerHTML=html;
   el("ev-save").onclick=function(){ pf.event={name:el("ev-name").value.trim(),date:el("ev-date").value}; save(); toast(pf.event.date?"Noted. I will guard the week before.":"Cleared."); render(); };
+  el("me-ceil-save").onclick=function(){ var v=parseInt(el("me-ceil").value,10); pf.loadCeiling=(v>0?v:null); save(); toast(pf.loadCeiling?"Noted. Your number, not mine.":"Back to my suggestion."); render(); };
   el("exp-btn").onclick=function(){ var txt=exportSummary(); if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(function(){toast("Copied. Paste it anywhere.");}); } else prompt("Copy this:",txt); };
   el("reset-btn").onclick=function(){ if(confirm("This deletes everything. Sure?")){ localStorage.removeItem("linden"); location.reload(); } };
 }
