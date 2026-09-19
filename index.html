@@ -1195,18 +1195,63 @@ function valiseTrip(){
   }catch(e){ return null; }
 }
 /* reminders: computed on open, shown as flags, and as notifications when allowed */
+/* did anything sharp go on last night? changes what the sun means today */
+function loggedTag(dateISO,half,tag){
+  var l=S.logs.filter(function(x){return x.date===dateISO;})[0]; if(!l||!l[half]) return null;
+  var hit=null;
+  l[half].forEach(function(id){ var p=getProduct(id); if(p&&!isDevice(p)&&(p.tags||[]).indexOf(tag)>-1) hit=p; });
+  return hit;
+}
+function yesterdayISO(){ var d=new Date(); d.setDate(d.getDate()-1); return d.toISOString().slice(0,10); }
+/* everything worth saying today, most useful first */
 function dueReminders(){
-  var t=todayISO(), out=[];
-  activeProducts().forEach(function(p){ var j=judgement(p); if(j&&p.status==="cygnet"&&j.left===0) out.push("Verdict day for "+p.name+". Is it working?"); });
-  if(S.env&&S.env.uv!==null&&S.env.uv>=6&&S.env.at===t) out.push("UV is "+Math.round(S.env.uv)+" today. Reapply sunscreen if you are out.");
-  if(S.profile&&S.profile.event&&S.profile.event.date){ var d=daysBetween(t,S.profile.event.date); if(d===7) out.push("One week to "+(S.profile.event.name||"your event")+". Nothing new from here."); }
-  var vt=valiseTrip(); if(vt) out.push("Valise says you are off to "+(vt.dest||"somewhere")+". Travel mode is ready when you are.");
+  var t=todayISO(), y=yesterdayISO(), out=[];
+
+  /* the sun, read against what went on last night rather than in isolation */
+  if(S.env&&S.env.uv!==null&&S.env.uv>=6&&S.env.at===t){
+    var ret=loggedTag(y,"pm","retinoid")||loggedTag(y,"pm","aha")||loggedTag(y,"pm","bha");
+    out.push(ret?("UV is "+Math.round(S.env.uv)+" and you used "+ret.name+" last night. That barrier is still recovering, so today is a reapply day, not a skip day.")
+                :("UV is "+Math.round(S.env.uv)+" today. Two finger-lengths, and again every two hours if you are out."));
+  }
+
+  /* verdict day */
+  activeProducts().forEach(function(p){ var j=judgement(p); if(j&&p.status==="cygnet"&&j.left===0) out.push("Verdict day for "+p.name+". Photograph before you decide, not after."); });
+
+  /* the fortnight where people quit something that was working */
+  activeProducts().forEach(function(p){
+    if(p.status!=="cygnet"||!(p.tags||[]).length) return;
+    var d=daysBetween(p.started||p.added,t);
+    if(d===28||d===42) out.push("You are "+(d===28?"four":"six")+" weeks into "+p.name+". This is the stretch people give up in. Worth holding.");
+  });
+
+  /* dry air, which does more damage than most people credit */
+  if(S.env&&S.env.hum!==null&&S.env.hum<35&&S.env.at===t)
+    out.push("The air is dry today at "+Math.round(S.env.hum)+" per cent. Damp skin, then moisturiser, and go easy on anything sharp.");
+
+  /* air quality */
+  if(S.env&&S.env.aqi!==null&&S.env.aqi>=100&&S.env.at===t)
+    out.push("Air quality is poor today. Cleanse properly tonight rather than a quick pass.");
+
+  /* vitamin C past its best */
+  activeProducts().forEach(function(p){
+    if((p.tags||[]).indexOf("vitc")<0||!p.opened) return;
+    if(daysBetween(p.opened,t)===180) out.push(p.name+" opened six months ago. Vitamin C oxidises. If it has gone amber, it is done.");
+  });
+
+  /* events, and travel */
+  if(S.profile&&S.profile.event&&S.profile.event.date){ var de=daysBetween(t,S.profile.event.date); if(de===14||de===7) out.push(de+" days to "+(S.profile.event.name||"your event")+". Nothing new from here."); }
+  var vt=valiseTrip(); if(vt) out.push("You are off to "+(vt.dest||"somewhere")+" shortly. Travel mode is ready when you are.");
   return out;
 }
+/* one notification a day, carrying the two lines that matter most */
 function fireReminders(){
   var due=dueReminders(); if(!due.length) return;
   var key="linden_rem_"+todayISO(); if(store.get(key)) return; store.set(key,1);
-  if("Notification" in window&&Notification.permission==="granted"){ due.forEach(function(m){ try{ new Notification("Linden",{body:m}); }catch(e){} }); }
+  var body=due.slice(0,2).join("\n\n");
+  if(due.length>2) body+="\n\n"+(due.length-2)+" more inside.";
+  if("Notification" in window&&Notification.permission==="granted"){
+    try{ new Notification("Linden",{body:body,tag:"linden-daily",renotify:false}); }catch(e){ toast(due[0]); }
+  }
   else toast(due[0]);
 }
 /* extra Today flags from phases 2 to 4 */
